@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32083048159",
+    "project_id": "super-wolf-firebase",
+    "storage_bucket": "super-wolf-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32083048159:android:3a247e48cdb638f4635b6a",
+        "android_client_info": {
+          "package_name": "com.example.superwolffirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3b6RCiaM57GgL6qHjlemNbc4_u4qmTXc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

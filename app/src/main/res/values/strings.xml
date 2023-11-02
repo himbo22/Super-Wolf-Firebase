@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Super Wolf Firebase</string>
+    <string name="skip">SKIP</string>
+    <string name="password">PASSWORD</string>
+    <string name="email">EMAIL</string>
+    <string name="super_wolf">SUPER WOLF</string>
+    <string name="login">LOGIN</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="create_account">Create account</string>
 </resources>

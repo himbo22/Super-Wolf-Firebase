@@ -7,4 +7,8 @@
     <string name="login">LOGIN</string>
     <string name="forgot_password">Forgot password</string>
     <string name="create_account">Create account</string>
+    <string name="register">REGISTER</string>
+    <string name="name">NAME</string>
+    <string name="already_have_an_account">Already have an account</string>
+    <string name="play">PLAY</string>
 </resources>

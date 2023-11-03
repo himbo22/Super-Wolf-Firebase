@@ -12,17 +12,14 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class RegisterViewModel @Inject constructor(
     private val repository: BaseAuth
 ) : ViewModel() {
+    private val _registerResponse = MutableLiveData<Resource<FirebaseUser>>()
+    val registerResponse get() = _registerResponse
 
-    private val _loginResponse = MutableLiveData<Resource<FirebaseUser>>()
-    val loginResponse get() = _loginResponse
-
-
-    fun login(email: String, password: String) = viewModelScope.launch {
-        val result = repository.login(email, password)
-        _loginResponse.postValue(result)
+    fun register(name: String, email: String, password: String) = viewModelScope.launch {
+        val result = repository.signUp(name, email, password)
+        _registerResponse.postValue(result)
     }
-
 }

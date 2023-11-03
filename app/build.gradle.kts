@@ -81,6 +81,9 @@ dependencies {
     
     // circle Indicator
     implementation("me.relex:circleindicator:2.1.6")
+
+    // for shared preferences
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
 }
 
 kapt {

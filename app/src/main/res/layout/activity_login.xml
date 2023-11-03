@@ -15,7 +15,8 @@
         android:layout_marginTop="110dp"
         android:layout_marginStart="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAccessibility="no" />
 
     <TextView
         android:id="@+id/textView"
@@ -37,7 +38,8 @@
         android:layout_marginEnd="20dp"
         android:src="@drawable/sun"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAccessibility="no" />
 
 
     <RelativeLayout

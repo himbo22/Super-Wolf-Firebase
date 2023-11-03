@@ -17,7 +17,7 @@ class BaseAuthImpl @Inject constructor(
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             Resource.Success(result.user!!)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Resource.Error(e)
         }
 
@@ -30,9 +30,11 @@ class BaseAuthImpl @Inject constructor(
     ): Resource<FirebaseUser> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            result?.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name).build())?.await()
+            result?.user?.updateProfile(
+                UserProfileChangeRequest.Builder().setDisplayName(name).build()
+            )?.await()
             Resource.Success(result.user!!)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Resource.Error(e)
         }
     }

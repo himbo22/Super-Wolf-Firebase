@@ -18,7 +18,8 @@ class ViewPagerAdapter(
     private val imageList: List<Int>
 ) : RecyclerView.Adapter<ViewPagerAdapter.Pager2ViewHolder>() {
 
-    inner class Pager2ViewHolder(val binding: ItemPagerBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class Pager2ViewHolder(val binding: ItemPagerBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Pager2ViewHolder {
         return Pager2ViewHolder(

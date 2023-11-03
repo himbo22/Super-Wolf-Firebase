@@ -1,5 +1,6 @@
 package com.example.superwolffirebase.views
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -14,11 +15,14 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var intentToRegisterActivity: Intent
     private val viewModel by viewModels<LoginViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        intentToRegisterActivity = Intent(this@LoginActivity, RegisterActivity::class.java)
 
         binding.btLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()
@@ -26,8 +30,13 @@ class LoginActivity : AppCompatActivity() {
             viewModel.login(email, password)
         }
 
-        viewModel.loginResponse.observe(this){
-            when(it){
+        binding.createAccount.setOnClickListener {
+            startActivity(intentToRegisterActivity)
+            finish()
+        }
+
+        viewModel.loginResponse.observe(this) {
+            when (it) {
                 is Resource.Success -> {
                     Toast.makeText(this@LoginActivity, "Ok", Toast.LENGTH_SHORT).show()
                 }

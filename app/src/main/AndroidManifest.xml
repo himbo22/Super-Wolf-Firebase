@@ -16,6 +16,12 @@
         android:theme="@style/Theme.SuperWolfFirebase"
         tools:targetApi="31">
         <activity
+            android:name=".views.SetUpProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.MainScreenActivity"
+            android:exported="false" />
+        <activity
             android:name=".views.RegisterActivity"
             android:exported="false" />
         <activity

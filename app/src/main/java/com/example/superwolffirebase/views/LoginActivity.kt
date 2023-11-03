@@ -32,7 +32,6 @@ class LoginActivity : AppCompatActivity() {
 
         binding.createAccount.setOnClickListener {
             startActivity(intentToRegisterActivity)
-            finish()
         }
 
         viewModel.loginResponse.observe(this) {

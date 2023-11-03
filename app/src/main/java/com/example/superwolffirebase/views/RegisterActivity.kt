@@ -36,10 +36,12 @@ class RegisterActivity : AppCompatActivity() {
         viewModel.registerResponse.observe(this) {
             when (it) {
                 is Resource.Success -> {
+                    Toast.makeText(this@RegisterActivity, "Ok", Toast.LENGTH_SHORT).show()
 
                 }
 
                 is Resource.Error -> {
+
                     Toast.makeText(
                         this@RegisterActivity,
                         "Check the information again!!",

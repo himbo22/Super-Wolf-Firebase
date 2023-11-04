@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.viewpager2.widget.ViewPager2
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.adapter.ViewPagerAdapter
@@ -33,6 +34,9 @@ class TutorialActivity : AppCompatActivity() {
         addImageToList()
         handleView()
         setUpViewPager()
+
+        Thread.sleep(3000)
+        installSplashScreen()
     }
 
     private fun addImageToList() {

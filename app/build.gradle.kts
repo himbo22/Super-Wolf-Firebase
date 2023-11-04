@@ -84,6 +84,9 @@ dependencies {
 
     // for shared preferences
     implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
+
+    // for splash screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
 
 kapt {

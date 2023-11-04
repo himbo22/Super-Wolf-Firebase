@@ -5,6 +5,8 @@ import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.BaseAuthImpl
 import com.example.superwolffirebase.manager.SharePrefManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,5 +31,13 @@ object Module {
     fun provideSharedPreferences(
         sharePrefManager: SharePrefManager
     ): SharedPreferences = sharePrefManager.getSharePref()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 
 }

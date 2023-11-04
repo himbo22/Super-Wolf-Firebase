@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SuperWolfFirebase"
+        android:theme="@style/Base.Theme.SuperWolfFirebase"
         tools:targetApi="31">
 
         <activity
@@ -33,7 +33,6 @@
             android:exported="false" />
         <activity
             android:name=".views.TutorialActivity"
-            android:theme="@style/Theme.Splash"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

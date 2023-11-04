@@ -11,4 +11,5 @@
     <string name="name">NAME</string>
     <string name="already_have_an_account">Already have an account</string>
     <string name="play">PLAY</string>
+    <string name="gender">GENDER</string>
 </resources>

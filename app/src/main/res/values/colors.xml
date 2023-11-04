@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="sun_yellow">#ffd347</color>
     <color name="soft_pink">#F1D5E4</color>
+    <color name="dark_pink">#D5348A</color>
+    <color name="mtrl_textinput_default_box_stroke_color">#D5348A</color>
 </resources>

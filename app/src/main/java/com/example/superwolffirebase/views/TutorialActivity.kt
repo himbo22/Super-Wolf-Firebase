@@ -25,8 +25,8 @@ class TutorialActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTutorialBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+        setContentView(binding.root)
         intentToLoginActivity = Intent(this@TutorialActivity, LoginActivity::class.java)
 
         viewModel.check()
@@ -35,8 +35,6 @@ class TutorialActivity : AppCompatActivity() {
         handleView()
         setUpViewPager()
 
-        Thread.sleep(3000)
-        installSplashScreen()
     }
 
     private fun addImageToList() {

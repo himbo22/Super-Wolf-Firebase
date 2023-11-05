@@ -60,7 +60,7 @@
             android:fontFamily="@font/octobernight"
             android:hint="@string/name"
             android:importantForAutofill="no"
-            android:inputType="textEmailAddress"
+            android:inputType="text"
             android:paddingStart="12dp"
             android:textSize="18sp"
             tools:ignore="RtlSymmetry" />

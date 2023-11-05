@@ -58,6 +58,7 @@
 
         <EditText
             android:id="@+id/et_email"
+            android:inputType="textEmailAddress"
             android:background="@drawable/custom_input"
             android:drawableStart="@drawable/ic_email"
             android:hint="@string/email"
@@ -71,6 +72,7 @@
         <EditText
             android:paddingStart="12dp"
             android:id="@+id/et_password"
+            android:inputType="textPassword"
             android:background="@drawable/custom_input"
             android:drawableStart="@drawable/ic_lock"
             android:hint="@string/password"

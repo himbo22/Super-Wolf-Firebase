@@ -40,6 +40,10 @@ class RegisterActivity : AppCompatActivity() {
             when (it) {
                 is Resource.Success -> {
                     startActivity(intentToSetUpProfileActivity)
+                    intentToSetUpProfileActivity.putExtra("uid", it.result.uid)
+                    intentToSetUpProfileActivity.putExtra("email", it.result.email)
+                    intentToSetUpProfileActivity.putExtra("password", binding.etPassword.text)
+                    intentToSetUpProfileActivity.putExtra("name", it.result.displayName)
                     finish()
                 }
 

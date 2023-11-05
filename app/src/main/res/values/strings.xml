@@ -12,4 +12,12 @@
     <string name="already_have_an_account">Already have an account</string>
     <string name="play">PLAY</string>
     <string name="gender">GENDER</string>
+    <string name="female">FEMALE</string>
+    <string name="confirm">Confirm</string>
+    <string name="set_up_your_profile">Set up your profile</string>
+    <string-array name="gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Others</item>
+    </string-array>
 </resources>

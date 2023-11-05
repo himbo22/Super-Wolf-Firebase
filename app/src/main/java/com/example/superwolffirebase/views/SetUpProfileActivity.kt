@@ -16,21 +16,36 @@ import dagger.hilt.android.AndroidEntryPoint
 class SetUpProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySetUpProfileBinding
     private val viewModel by viewModels<SetUpProfileViewModel>()
-    private lateinit var genderList: Array<String>
-    private lateinit var adapter: ArrayAdapter<String>
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var uid: String
+    private lateinit var name: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySetUpProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        genderList = arrayOf("Male", "Female", "Others")
-        adapter = ArrayAdapter(applicationContext, R.layout.drop_down_item, R.id.gender, genderList)
+        getAllStringExtraFromRegisterActivity()
 
-        binding.optionGender.setAdapter(adapter)
 
         binding.optionGender.setOnItemClickListener { parent, view, position, id ->
             Toast.makeText(this@SetUpProfileActivity, binding.optionGender.text, Toast.LENGTH_SHORT).show()
         }
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        val gender = resources.getStringArray(R.array.gender)
+        val arrayAdapter = ArrayAdapter(applicationContext, R.layout.drop_down_item, gender)
+        binding.optionGender.setAdapter(arrayAdapter)
+    }
+
+    private fun getAllStringExtraFromRegisterActivity(){
+        uid = intent.getStringExtra("uid").toString()
+        email = intent.getStringExtra("email").toString()
+        password = intent.getStringExtra("password").toString()
+        name = intent.getStringExtra("name").toString()
+    }
 }
+

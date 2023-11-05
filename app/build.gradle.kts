@@ -89,6 +89,11 @@ dependencies {
 
     // for splash screen
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // coil
+    implementation("io.coil-kt:coil:2.4.0")
+
+    //
 }
 
 kapt {

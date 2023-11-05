@@ -1,7 +1,6 @@
 package com.example.superwolffirebase.viewmodel
 
-import android.net.Uri
-import android.widget.Toast
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.superwolffirebase.models.Player
@@ -16,11 +15,20 @@ import javax.inject.Inject
 @HiltViewModel
 class SetUpProfileViewModel @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase,
-    private val firebaseStorage: FirebaseStorage
+    private val firebaseStorage: FirebaseStorage,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _uploadProfileStatus = MutableLiveData<Resource<FirebaseDatabase>>()
     val uploadProfileStatus get() = _uploadProfileStatus
+
+    fun isCompletedProfile(){
+        sharedPreferences.edit().putString("completedProfile", "yes").apply()
+    }
+
+    fun unFinishedProfile(){
+        sharedPreferences.edit().putString("completedProfile", "unfinished").apply()
+    }
 
     fun uploadProfile(id: String,
                       name: String,

@@ -1,13 +1,13 @@
 package com.example.superwolffirebase.views
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ActivitySetUpProfileBinding
+import com.example.superwolffirebase.utils.makeToast
 import com.example.superwolffirebase.viewmodel.SetUpProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,17 +20,22 @@ class SetUpProfileActivity : AppCompatActivity() {
     private lateinit var password: String
     private lateinit var uid: String
     private lateinit var name: String
+    private lateinit var avatar: Uri
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySetUpProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel.unFinishedProfile()
+
         getAllStringExtraFromRegisterActivity()
 
-
         binding.optionGender.setOnItemClickListener { parent, view, position, id ->
-            Toast.makeText(this@SetUpProfileActivity, binding.optionGender.text, Toast.LENGTH_SHORT).show()
+            makeToast(this@SetUpProfileActivity, binding.optionGender.text.toString())
         }
+
+        binding.tvEmail.text = email
+        binding.tvName.text = name
 
     }
 

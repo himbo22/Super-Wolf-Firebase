@@ -19,6 +19,7 @@ class RegisterViewModel @Inject constructor(
     val registerResponse get() = _registerResponse
 
     fun register(name: String, email: String, password: String) = viewModelScope.launch {
+        _registerResponse.postValue(Resource.Loading)
         val result = repository.signUp(name, email, password)
         _registerResponse.postValue(result)
     }

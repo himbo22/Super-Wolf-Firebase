@@ -7,7 +7,6 @@ import android.os.Build
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.crypto.EncryptedPrivateKeyInfo
 import javax.inject.Inject
 
 class SharePrefManager @Inject constructor(

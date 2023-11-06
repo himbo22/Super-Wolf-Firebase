@@ -1,13 +1,10 @@
 package com.example.superwolffirebase.views
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
-import com.example.superwolffirebase.R
+import androidx.appcompat.app.AppCompatActivity
 import com.example.superwolffirebase.databinding.ActivityMainScreenBinding
-import com.example.superwolffirebase.databinding.ActivitySetUpProfileBinding
 import com.example.superwolffirebase.viewmodel.MainScreenViewModel
-import com.example.superwolffirebase.viewmodel.SetUpProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 

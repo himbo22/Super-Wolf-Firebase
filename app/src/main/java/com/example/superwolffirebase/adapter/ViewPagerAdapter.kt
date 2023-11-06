@@ -1,18 +1,9 @@
 package com.example.superwolffirebase.adapter
 
-import android.app.Application
-import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.PagerAdapter
-import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ItemPagerBinding
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.Objects
 
 class ViewPagerAdapter(
     private val imageList: List<Int>

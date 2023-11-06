@@ -1,13 +1,14 @@
 package com.example.superwolffirebase.views
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.example.superwolffirebase.databinding.ActivityRegisterBinding
 import com.example.superwolffirebase.other.Resource
-import com.example.superwolffirebase.utils.makeToast
+import com.example.superwolffirebase.utils.invisible
+import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.viewmodel.RegisterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,12 +17,13 @@ class RegisterActivity : AppCompatActivity() {
     private val viewModel by viewModels<RegisterViewModel>()
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var intentToSetUpProfileActivity: Intent
+    private lateinit var intentBackToLoginActivity: Intent
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        intentToSetUpProfileActivity =
-            Intent(this@RegisterActivity, SetUpProfileActivity::class.java)
+        intentToSetUpProfileActivity = Intent(this@RegisterActivity, SetUpProfileActivity::class.java)
+        intentBackToLoginActivity = Intent(this@RegisterActivity, LoginActivity::class.java)
 
         binding.btRegister.setOnClickListener {
             val name = binding.etName.text.toString()
@@ -38,22 +40,29 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-
+        binding.haveAccount.setOnClickListener {
+            startActivity(intentBackToLoginActivity)
+            finish()
+        }
 
         viewModel.registerResponse.observe(this) {
             when (it) {
+
+                is Resource.Loading -> {
+                    binding.rlLoading.show()
+                }
+
                 is Resource.Success -> {
+                    binding.rlLoading.invisible()
                     intentToSetUpProfileActivity.putExtra("uid", it.result.uid)
                     intentToSetUpProfileActivity.putExtra("email", it.result.email)
-                    intentToSetUpProfileActivity.putExtra("password", "asd")
                     intentToSetUpProfileActivity.putExtra("name", it.result.displayName)
                     startActivity(intentToSetUpProfileActivity)
                     finish()
                 }
 
                 is Resource.Error -> {
-
-                    makeToast(this@RegisterActivity, "Check the information again!!")
+                    Toast.makeText(this@RegisterActivity, "Check the information again!!", Toast.LENGTH_SHORT).show()
                 }
 
                 else -> {}

@@ -24,6 +24,7 @@ class TutorialViewModel @Inject constructor(
 
 
     fun check() {
+        _checkSkipStatus.postValue(Event(Resource.Loading))
         if (sharedPreferences.getBoolean("skip-tutorial", false)) {
             _checkSkipStatus.postValue(Event(Resource.Success(1)))
         }

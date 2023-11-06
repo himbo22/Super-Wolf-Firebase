@@ -1,14 +1,16 @@
 package com.example.superwolffirebase.views
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.adapter.ViewPagerAdapter
 import com.example.superwolffirebase.databinding.ActivityTutorialBinding
 import com.example.superwolffirebase.other.Resource
+import com.example.superwolffirebase.utils.invisible
+import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.viewmodel.TutorialViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -63,7 +65,11 @@ class TutorialActivity : AppCompatActivity() {
             if(!event.hasBeenHandled){
                 event.getContentIfNotHandled()?.let { resource ->
                     when(resource){
+                        is Resource.Loading -> {
+                            binding.rlLoading.show()
+                        }
                         is Resource.Success -> {
+                            binding.rlLoading.invisible()
                             startActivity(intentToLoginActivity)
                             finish()
                         }

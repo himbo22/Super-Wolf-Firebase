@@ -1,12 +1,10 @@
 package com.example.superwolffirebase.views
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.example.superwolffirebase.R
+import androidx.appcompat.app.AppCompatActivity
 import com.example.superwolffirebase.databinding.ActivityLoginBinding
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.viewmodel.LoginViewModel
@@ -34,6 +32,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.createAccount.setOnClickListener {
             startActivity(intentToRegisterActivity)
+            finish()
         }
 
         viewModel.loginResponse.observe(this) {

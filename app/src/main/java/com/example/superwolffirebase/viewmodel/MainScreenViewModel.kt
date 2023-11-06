@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel

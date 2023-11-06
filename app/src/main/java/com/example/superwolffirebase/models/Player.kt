@@ -1,23 +1,13 @@
 package com.example.superwolffirebase.models
 
-import android.net.Uri
-
 data class Player(
-    val id: String,
-    val name: String,
-    val avatar: String,
-    val gender: String,
-    val email: String,
-    val password: String? = null,
-    val role: Roles,
-    val status: Status
+    var id: String,
+    var name: String,
+    var avatar: String,
+    var gender: String,
+    var email: String,
+    var role: String? = null,
+    var status: String? = null
 )
 
-enum class Roles{
-    None, Werewolf, Villager, Seer, Guard, Witch
-}
-
-enum class Status{
-    None, Dead, Alive
-}
 

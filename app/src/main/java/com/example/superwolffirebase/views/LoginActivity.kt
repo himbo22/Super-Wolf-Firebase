@@ -7,7 +7,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.superwolffirebase.databinding.ActivityLoginBinding
 import com.example.superwolffirebase.other.Resource
+import com.example.superwolffirebase.utils.invisible
+import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.viewmodel.LoginViewModel
+import com.example.superwolffirebase.views.mainscreen.MainScreenActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -15,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var intentToRegisterActivity: Intent
+    private lateinit var intentToMainScreenActivity: Intent
     private val viewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         intentToRegisterActivity = Intent(this@LoginActivity, RegisterActivity::class.java)
+        intentToMainScreenActivity = Intent(this@LoginActivity, MainScreenActivity::class.java)
 
         binding.btLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()
@@ -37,12 +42,18 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel.loginResponse.observe(this) {
             when (it) {
+                is Resource.Loading -> {
+                    binding.rlLoading.show()
+                }
                 is Resource.Success -> {
+                    binding.rlLoading.invisible()
                     Toast.makeText(this@LoginActivity, "Ok", Toast.LENGTH_SHORT).show()
+                    startActivity(intentToMainScreenActivity)
+                    finish()
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(this@LoginActivity, "Error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "Email or password are invalid!", Toast.LENGTH_SHORT).show()
                 }
 
                 else -> {}

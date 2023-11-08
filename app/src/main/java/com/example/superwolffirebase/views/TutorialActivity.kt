@@ -2,6 +2,7 @@ package com.example.superwolffirebase.views
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
@@ -66,6 +67,7 @@ class TutorialActivity : AppCompatActivity() {
                 event.getContentIfNotHandled()?.let { resource ->
                     when(resource){
                         is Resource.Loading -> {
+                            Toast.makeText(this@TutorialActivity, "yes sir", Toast.LENGTH_SHORT).show()
                             binding.rlLoading.show()
                         }
                         is Resource.Success -> {

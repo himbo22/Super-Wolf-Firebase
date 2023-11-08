@@ -20,7 +20,15 @@ class LoginViewModel @Inject constructor(
     val loginResponse get() = _loginResponse
 
 
+
+//    init {
+//        if(repository.currentUser != null){
+//            _loginResponse.postValue(Resource.Success(repository.currentUser!!))
+//        }
+//    }
+
     fun login(email: String, password: String) = viewModelScope.launch {
+        _loginResponse.postValue(Resource.Loading)
         val result = repository.login(email, password)
         _loginResponse.postValue(result)
     }

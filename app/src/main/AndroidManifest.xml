@@ -25,7 +25,7 @@
             android:name=".views.SetUpProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".views.MainScreenActivity"
+            android:name=".views.mainscreen.MainScreenActivity"
             android:exported="false" />
         <activity
             android:name=".views.RegisterActivity"

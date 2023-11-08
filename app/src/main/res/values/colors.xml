@@ -7,4 +7,5 @@
     <color name="dark_pink">#D5348A</color>
     <color name="mtrl_textinput_default_box_stroke_color">#D5348A</color>
     <color name="transparent">#00000000</color>
+    <color name="disable">#939191</color>
 </resources>

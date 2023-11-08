@@ -68,7 +68,8 @@
             android:fontFamily="@font/octobernight"
             android:drawablePadding="3dp"
             android:layout_width="match_parent"
-            android:layout_height="60dp"/>
+            android:layout_height="60dp"
+            android:autofillHints="" />
         <EditText
             android:paddingStart="12dp"
             android:id="@+id/et_password"
@@ -82,7 +83,8 @@
             android:fontFamily="@font/octobernight"
             android:drawablePadding="3dp"
             android:layout_width="match_parent"
-            android:layout_height="60dp"/>
+            android:layout_height="60dp"
+            android:autofillHints="" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bt_login"
@@ -154,6 +156,24 @@
             android:layout_width="50dp"
             android:layout_height="50dp"/>
     </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_loading"
+        android:visibility="invisible"
+        android:background="@color/transparent"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ProgressBar
+            android:indeterminate="true"
+            android:indeterminateTint="@color/black"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

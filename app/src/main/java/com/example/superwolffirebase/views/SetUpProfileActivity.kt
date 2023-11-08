@@ -12,7 +12,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ActivitySetUpProfileBinding
 import com.example.superwolffirebase.other.Resource
+import com.example.superwolffirebase.utils.invisible
+import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.viewmodel.SetUpProfileViewModel
+import com.example.superwolffirebase.views.mainscreen.MainScreenActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -82,7 +85,13 @@ class SetUpProfileActivity : AppCompatActivity() {
 
         viewModel.uploadProfileStatus.observe(this) { resource ->
             when (resource) {
+
+                is Resource.Loading -> {
+                    binding.rlLoading.show()
+                }
+
                 is Resource.Success -> {
+                    binding.rlLoading.invisible()
                     startActivity(intentToMainScreenActivity)
                     finish()
                 }

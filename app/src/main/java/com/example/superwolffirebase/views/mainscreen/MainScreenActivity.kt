@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.views
+package com.example.superwolffirebase.views.mainscreen
 
 import android.os.Bundle
 import androidx.activity.viewModels

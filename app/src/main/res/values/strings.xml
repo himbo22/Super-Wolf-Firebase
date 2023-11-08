@@ -15,9 +15,15 @@
     <string name="female">FEMALE</string>
     <string name="confirm">Confirm</string>
     <string name="set_up_your_profile">Set up your profile</string>
+    <string name="profile">PROFILE</string>
+    <string name="setting">SETTING</string>
+    <string name="friends">FRIENDS</string>
+    <string name="about">ABOUT</string>
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
         <item>Others</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

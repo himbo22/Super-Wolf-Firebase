@@ -7,7 +7,7 @@ data class Player(
     var gender: String,
     var email: String,
     var role: String? = null,
-    var status: String? = null
+    var status: String? = null,
 )
 
 

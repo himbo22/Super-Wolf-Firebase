@@ -5,9 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
+import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.FragmentMainScreenBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainScreenFragment : Fragment() {
 
     private var _binding: FragmentMainScreenBinding? = null
@@ -22,8 +27,31 @@ class MainScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
+        val view = binding.root
 
-        return binding.root
+        setUpFragmentAction()
+
+        return view
+    }
+
+    private fun setUpFragmentAction(){
+        binding.apply {
+            playButton.setOnClickListener {
+                findNavController().navigate(R.id.action_mainScreenFragment_to_playFragment2)
+            }
+            profileButton.setOnClickListener{
+                findNavController().navigate(R.id.action_mainScreenFragment_to_profileFragment)
+            }
+            friendsButton.setOnClickListener {
+                findNavController().navigate(R.id.action_mainScreenFragment_to_friendsFragment)
+            }
+            settingButton.setOnClickListener {
+                findNavController().navigate(R.id.action_mainScreenFragment_to_settingFragment)
+            }
+            aboutButton.setOnClickListener {
+                findNavController().navigate(R.id.action_mainScreenFragment_to_aboutFragment)
+            }
+        }
     }
 
     override fun onDestroy() {

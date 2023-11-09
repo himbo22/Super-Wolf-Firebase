@@ -1,6 +1,7 @@
 package com.example.superwolffirebase.api
 
 import android.util.Log
+import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.await
 import com.google.firebase.auth.FirebaseAuth
@@ -14,12 +15,12 @@ class BaseAuthImpl @Inject constructor(
     override val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
 
-    override suspend fun login(email: String, password: String): Resource<FirebaseUser> {
+    override suspend fun login(email: String, password: String): Event<Resource<FirebaseUser>> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Resource.Success(result.user!!)
+            Event(Resource.Success(result.user!!))
         } catch (e: Exception) {
-            Resource.Error(e)
+            Event(Resource.Error(e))
         }
 
     }
@@ -28,17 +29,18 @@ class BaseAuthImpl @Inject constructor(
         name: String,
         email: String,
         password: String
-    ): Resource<FirebaseUser> {
+    ): Event<Resource<FirebaseUser>> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             result?.user?.updateProfile(
                 UserProfileChangeRequest.Builder().setDisplayName(name).build()
             )?.await()
-            Resource.Success(result.user!!)
+            Event(Resource.Success(result.user!!))
+
         } catch (e: Exception) {
             Log.d("hoangdeptrai", e.message.toString())
             e.printStackTrace()
-            Resource.Error(e)
+            Event(Resource.Error(e))
         }
     }
 

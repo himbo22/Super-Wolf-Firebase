@@ -1,173 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:backgroundTint="@color/soft_pink"
-    android:background="@color/white"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:backgroundTint="@color/soft_pink"
     tools:context=".views.SetUpProfileActivity">
+
+
+
 
 
     <TextView
         android:id="@+id/setup"
-        android:text="@string/set_up_your_profile"
-        android:textSize="30sp"
-        android:fontFamily="@font/octobernight"
-        android:textColor="@color/black"
-        android:gravity="center"
-        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/octobernight"
+        android:gravity="center"
+        android:text="@string/set_up_your_profile"
+        android:textColor="@color/black"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/ll1"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginTop="30dp"
         android:background="@drawable/relativelayout_background"
         android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setup"
-        android:layout_width="120dp"
-        android:layout_height="120dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setup">
 
         <ImageView
             android:id="@+id/avatar"
-            android:src="@mipmap/ic_launcher_round"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher_round" />
 
     </LinearLayout>
 
 
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/topic"
-        android:textAlignment="viewStart"
-        app:boxStrokeColor="@color/dark_pink"
-        app:hintTextColor="@color/dark_pink"
-        app:cursorColor="@color/dark_pink"
-        app:endIconTint="@color/dark_pink"
-
-        android:textColorHint="@color/black"
-
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll1"
-        android:hint="@string/gender"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
         android:layout_width="150dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColorHint="@color/black"
+        app:boxStrokeColor="@color/dark_pink"
+        app:cursorColor="@color/dark_pink"
+        app:endIconTint="@color/dark_pink"
+        app:hintTextColor="@color/dark_pink"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll1">
 
         <AutoCompleteTextView
-            android:gravity="center"
-            android:fontFamily="@font/octobernight"
             android:id="@+id/option_gender"
-            android:inputType="none"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/octobernight"
+            android:gravity="center"
+            android:hint="@string/gender"
+            android:inputType="none"
+            android:textColorHint="@color/dark_pink" />
 
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:id="@+id/name"
-        android:background="@drawable/relativelayout_background"
-        android:orientation="horizontal"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topic"
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/relativelayout_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topic">
 
         <ImageView
-            android:src="@drawable/ic_person"
-            android:layout_margin="10dp"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:importantForAccessibility="no" />
+            android:layout_margin="10dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_person" />
 
         <TextView
             android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textSize="15sp"
             android:fontFamily="@font/octobernight"
             android:text="@string/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/email"
-        android:background="@drawable/relativelayout_background"
-        android:orientation="horizontal"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name"
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/relativelayout_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name">
 
         <ImageView
-            android:src="@drawable/ic_email"
-            android:layout_margin="10dp"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:importantForAccessibility="no" />
+            android:layout_margin="10dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_email" />
 
         <TextView
             android:id="@+id/tv_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textSize="15sp"
             android:fontFamily="@font/octobernight"
             android:text="@string/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+
+    <TextView
         android:id="@+id/confirm_button"
-        android:text="@string/confirm"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/custom_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/email"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="15dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/octobernight"
+        android:textSize="20sp"
+        android:background="@drawable/custom_button"
+        android:text="@string/confirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/email"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 
 
     <RelativeLayout
         android:id="@+id/rl_loading"
-        android:visibility="invisible"
-        android:background="@color/transparent"
-
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:visibility="invisible">
 
         <ProgressBar
-            android:indeterminate="true"
-            android:indeterminateTint="@color/black"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/black" />
     </RelativeLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

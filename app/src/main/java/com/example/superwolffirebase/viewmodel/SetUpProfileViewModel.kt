@@ -36,7 +36,7 @@ class SetUpProfileViewModel @Inject constructor(
         sharedPreferences.edit().putString("completedProfile", "unfinished").apply()
     }
 
-    fun saveAvatar(
+    fun saveProfile(
         uri: Uri,
         id: String,
         name: String,

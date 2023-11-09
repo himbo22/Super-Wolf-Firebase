@@ -45,28 +45,34 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.registerResponse.observe(this) {
-            when (it) {
+        viewModel.registerResponse.observe(this) {event->
+            if(!event.hasBeenHandled){
+                event.getContentIfNotHandled()?.let { resource->
+                    when (resource) {
 
-                is Resource.Loading -> {
-                    binding.rlLoading.show()
+                        is Resource.Loading -> {
+                            binding.rlLoading.show()
+                        }
+
+                        is Resource.Success -> {
+                            binding.rlLoading.invisible()
+                            intentToSetUpProfileActivity.putExtra("uid", resource.result.uid)
+                            intentToSetUpProfileActivity.putExtra("email", resource.result.email)
+                            intentToSetUpProfileActivity.putExtra("name", resource.result.displayName)
+                            startActivity(intentToSetUpProfileActivity)
+                            finish()
+                        }
+
+                        is Resource.Error -> {
+                            binding.rlLoading.invisible()
+                            Toast.makeText(this@RegisterActivity, "Check the information again!!", Toast.LENGTH_SHORT).show()
+                        }
+
+                        else -> {}
+                    }
                 }
-
-                is Resource.Success -> {
-                    binding.rlLoading.invisible()
-                    intentToSetUpProfileActivity.putExtra("uid", it.result.uid)
-                    intentToSetUpProfileActivity.putExtra("email", it.result.email)
-                    intentToSetUpProfileActivity.putExtra("name", it.result.displayName)
-                    startActivity(intentToSetUpProfileActivity)
-                    finish()
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(this@RegisterActivity, "Check the information again!!", Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {}
             }
+
         }
     }
 }

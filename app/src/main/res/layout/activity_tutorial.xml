@@ -41,6 +41,9 @@
     <RelativeLayout
         android:id="@+id/rl_loading"
         android:visibility="invisible"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:background="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

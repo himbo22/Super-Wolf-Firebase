@@ -40,24 +40,29 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.loginResponse.observe(this) {
-            when (it) {
-                is Resource.Loading -> {
-                    binding.rlLoading.show()
-                }
-                is Resource.Success -> {
-                    binding.rlLoading.invisible()
-                    Toast.makeText(this@LoginActivity, "Ok", Toast.LENGTH_SHORT).show()
-                    startActivity(intentToMainScreenActivity)
-                    finish()
-                }
+        viewModel.loginResponse.observe(this) {event->
+            if(!event.hasBeenHandled){
+                event.getContentIfNotHandled()?.let { resource->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            binding.rlLoading.show()
+                        }
+                        is Resource.Success -> {
+                            binding.rlLoading.invisible()
+                            Toast.makeText(this@LoginActivity, "Ok", Toast.LENGTH_SHORT).show()
+                            startActivity(intentToMainScreenActivity)
+                            finish()
+                        }
 
-                is Resource.Error -> {
-                    Toast.makeText(this@LoginActivity, "Email or password are invalid!", Toast.LENGTH_SHORT).show()
-                }
+                        is Resource.Error -> {
+                            binding.rlLoading.invisible()
+                            Toast.makeText(this@LoginActivity, "Email or password are invalid!", Toast.LENGTH_SHORT).show()
+                        }
 
-                else -> {}
+                    }
+                }
             }
+
         }
     }
 }

@@ -3,6 +3,8 @@ package com.example.superwolffirebase.views.mainscreen
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ActivityMainScreenBinding
 import com.example.superwolffirebase.viewmodel.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,5 +18,7 @@ class MainScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
     }
 }

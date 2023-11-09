@@ -26,4 +26,8 @@
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="change_password">CHANGE PASSWORD</string>
+    <string name="logout">LOGOUT</string>
+    <string name="change_name">CHANGE NAME</string>
+    <string name="update">UPDATE</string>
 </resources>

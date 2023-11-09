@@ -32,7 +32,7 @@ class SetUpProfileActivity : AppCompatActivity() {
     private lateinit var uid: String
     private lateinit var name: String
     private lateinit var gender: String
-    private lateinit var avatar: Uri
+    private var avatar: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +50,7 @@ class SetUpProfileActivity : AppCompatActivity() {
 
         binding.tvEmail.text = email
         binding.tvName.text = name
+
 
 
 //        cameraIntent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result->
@@ -70,16 +71,17 @@ class SetUpProfileActivity : AppCompatActivity() {
 
 
 
+
         binding.confirmButton.setOnClickListener {
-            if (binding.optionGender.text.isNullOrBlank()) {
+            if (binding.optionGender.text.isNullOrBlank() || avatar == null) {
                 Toast.makeText(
                     this@SetUpProfileActivity,
-                    "Please choose your gender!",
+                    "Please check your information again!",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
             } else {
-                viewModel.saveAvatar(avatar, uid, name, gender, email, "None", "None")
+                viewModel.saveProfile(avatar!!, uid, name, gender, email, "None", "None")
             }
         }
 
@@ -98,6 +100,7 @@ class SetUpProfileActivity : AppCompatActivity() {
 
 
                 is Resource.Error -> {
+                    binding.rlLoading.invisible()
                     Toast.makeText(this@SetUpProfileActivity, "No", Toast.LENGTH_SHORT).show()
                 }
 

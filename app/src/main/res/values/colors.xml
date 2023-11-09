@@ -8,4 +8,6 @@
     <color name="mtrl_textinput_default_box_stroke_color">#D5348A</color>
     <color name="transparent">#00000000</color>
     <color name="disable">#939191</color>
+    <color name="soft_purple">#9b78f0</color>
+    <color name="red">#FF0000</color>
 </resources>

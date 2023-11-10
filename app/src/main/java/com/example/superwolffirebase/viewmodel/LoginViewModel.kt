@@ -21,11 +21,11 @@ class LoginViewModel @Inject constructor(
     val loginResponse get() = _loginResponse
 
 
-//    init {
-//        if (repository.currentUser != null) {
-//            _loginResponse.postValue(Event(Resource.Success(repository.currentUser!!)))
-//        }
-//    }
+    init {
+        if (repository.currentUser != null) {
+            _loginResponse.postValue(Event(Resource.Success(repository.currentUser!!)))
+        }
+    }
 
     fun login(email: String, password: String) = viewModelScope.launch {
         _loginResponse.postValue(Event(Resource.Loading))

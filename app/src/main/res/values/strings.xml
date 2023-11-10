@@ -30,4 +30,8 @@
     <string name="logout">LOGOUT</string>
     <string name="change_name">CHANGE NAME</string>
     <string name="update">UPDATE</string>
+    <string name="change_gender">CHANGE GENDER</string>
+    <string name="add">+</string>
+    <string name="room_name">ROOM NAME</string>
+    <string name="_6_9">6/9</string>
 </resources>

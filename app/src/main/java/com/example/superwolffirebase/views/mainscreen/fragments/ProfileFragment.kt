@@ -59,7 +59,7 @@ class ProfileFragment : Fragment() {
                         }
 
                         is Resource.Error -> {
-
+                            binding.rlLoading.invisible()
                         }
 
 

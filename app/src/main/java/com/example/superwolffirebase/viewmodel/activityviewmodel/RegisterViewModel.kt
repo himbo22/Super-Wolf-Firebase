@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.viewmodel
+package com.example.superwolffirebase.viewmodel.activityviewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,4 +24,6 @@ class RegisterViewModel @Inject constructor(
         val result = repository.signUp(name, email, password)
         _registerResponse.postValue(result)
     }
+
+
 }

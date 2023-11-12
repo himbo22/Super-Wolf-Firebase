@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.viewmodel
+package com.example.superwolffirebase.viewmodel.activityviewmodel
 
 import android.content.SharedPreferences
 import android.net.Uri
@@ -42,12 +42,11 @@ class SetUpProfileViewModel @Inject constructor(
         name: String,
         gender: String,
         email: String,
-        role: String,
-        status: String
+
     ) = viewModelScope.launch(Dispatchers.IO) {
         _uploadProfileStatus.postValue(Resource.Loading)
         val result = async {
-            repository.uploadProfile(uri, id, name, gender, email, role, status)
+            repository.uploadProfile(uri, id, name, gender, email)
         }.await()
         _uploadProfileStatus.postValue(result)
     }

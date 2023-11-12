@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.views
+package com.example.superwolffirebase.views.mainscreen.activities
 
 import android.content.Intent
 import android.net.Uri
@@ -14,8 +14,7 @@ import com.example.superwolffirebase.databinding.ActivitySetUpProfileBinding
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
-import com.example.superwolffirebase.viewmodel.SetUpProfileViewModel
-import com.example.superwolffirebase.views.mainscreen.MainScreenActivity
+import com.example.superwolffirebase.viewmodel.activityviewmodel.SetUpProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -48,8 +47,8 @@ class SetUpProfileActivity : AppCompatActivity() {
             gender = binding.optionGender.text.toString()
         }
 
-        binding.tvEmail.text = email
-        binding.tvName.text = name
+        binding.etSetupEmail.setText(email)
+        binding.etSetupName.setText(name)
 
 
 
@@ -81,7 +80,7 @@ class SetUpProfileActivity : AppCompatActivity() {
                 ).show()
                 return@setOnClickListener
             } else {
-                viewModel.saveProfile(avatar!!, uid, name, gender, email, "None", "None")
+                viewModel.saveProfile(avatar!!, uid, name, gender, email)
             }
         }
 

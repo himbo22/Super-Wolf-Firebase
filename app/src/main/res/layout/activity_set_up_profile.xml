@@ -6,10 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:backgroundTint="@color/soft_pink"
-    tools:context=".views.SetUpProfileActivity">
-
-
-
+    tools:context=".views.mainscreen.activities.SetUpProfileActivity">
 
 
     <TextView
@@ -75,71 +72,48 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
-        android:id="@+id/name"
+    <EditText
+        android:id="@+id/et_setup_email"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginStart="50dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="50dp"
-        android:background="@drawable/relativelayout_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_input2"
+        android:drawableStart="@drawable/ic_person"
+        android:drawablePadding="3dp"
+        android:fontFamily="@font/octobernight"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:paddingStart="12dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topic">
+        app:layout_constraintTop_toBottomOf="@id/topic"
+        tools:ignore="RtlSymmetry,TextFields" />
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="10dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_person" />
-
-        <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:fontFamily="@font/octobernight"
-            android:text="@string/name"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/email"
+    <EditText
+        android:id="@+id/et_setup_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginStart="50dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="50dp"
-        android:background="@drawable/relativelayout_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_input2"
+        android:drawableStart="@drawable/ic_email"
+        android:drawablePadding="3dp"
+        android:fontFamily="@font/octobernight"
+        android:importantForAutofill="no"
+        android:inputType="textEmailAddress"
+        android:paddingStart="12dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name">
+        app:layout_constraintTop_toBottomOf="@id/et_setup_email"
+        tools:ignore="RtlSymmetry" />
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="10dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_email" />
-
-        <TextView
-            android:id="@+id/tv_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:fontFamily="@font/octobernight"
-            android:text="@string/email"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
 
 
     <TextView
@@ -147,19 +121,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:textStyle="bold"
+        android:background="@drawable/relativelayout_background"
+        android:fontFamily="@font/octobernight"
         android:paddingHorizontal="20dp"
         android:paddingVertical="15dp"
-        android:textColor="@color/black"
-        android:fontFamily="@font/octobernight"
-        android:textSize="20sp"
-        android:background="@drawable/custom_button"
         android:text="@string/confirm"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/email"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
+        app:layout_constraintTop_toBottomOf="@id/et_setup_email" />
 
 
     <RelativeLayout
@@ -179,7 +152,6 @@
             android:indeterminate="true"
             android:indeterminateTint="@color/black" />
     </RelativeLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

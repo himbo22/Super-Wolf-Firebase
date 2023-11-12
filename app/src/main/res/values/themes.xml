@@ -19,6 +19,7 @@
         <item name="textFillColor">@color/white</item>
         <item name="textOutlineColor">@color/white</item>
         <item name="android:editTextColor">@color/white</item>
+        <item name="searchIcon">@color/white</item>
     </style>
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">

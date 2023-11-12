@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.viewmodel
+package com.example.superwolffirebase.viewmodel.activityviewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

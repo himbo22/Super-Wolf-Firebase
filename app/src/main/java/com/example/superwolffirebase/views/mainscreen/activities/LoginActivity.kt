@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.views
+package com.example.superwolffirebase.views.mainscreen.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,8 +9,7 @@ import com.example.superwolffirebase.databinding.ActivityLoginBinding
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
-import com.example.superwolffirebase.viewmodel.LoginViewModel
-import com.example.superwolffirebase.views.mainscreen.MainScreenActivity
+import com.example.superwolffirebase.viewmodel.activityviewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 

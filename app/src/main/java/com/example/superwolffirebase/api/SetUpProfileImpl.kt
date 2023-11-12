@@ -25,8 +25,6 @@ class SetUpProfileImpl @Inject constructor(
         name: String,
         gender: String,
         email: String,
-        role: String,
-        status: String
     ): Resource<DatabaseReference> {
         return suspendCoroutine {continuation ->
             val date = Date().time.toString()
@@ -49,7 +47,7 @@ class SetUpProfileImpl @Inject constructor(
                 }).addOnCompleteListener {uri->
                     if (uri.isSuccessful){
                         val downloadUri = uri.result.toString()
-                        val player = Player(id, name, downloadUri, gender, email, role, status)
+                        val player = Player(id, name, downloadUri, gender, email)
 
                         firebaseDatabase.reference.child("players")
                             .child(id)

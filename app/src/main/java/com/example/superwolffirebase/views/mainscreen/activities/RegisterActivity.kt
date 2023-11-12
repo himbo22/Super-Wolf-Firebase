@@ -1,4 +1,4 @@
-package com.example.superwolffirebase.views
+package com.example.superwolffirebase.views.mainscreen.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,7 @@ import com.example.superwolffirebase.databinding.ActivityRegisterBinding
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
-import com.example.superwolffirebase.viewmodel.RegisterViewModel
+import com.example.superwolffirebase.viewmodel.activityviewmodel.RegisterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +22,8 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        intentToSetUpProfileActivity = Intent(this@RegisterActivity, SetUpProfileActivity::class.java)
+        intentToSetUpProfileActivity =
+            Intent(this@RegisterActivity, SetUpProfileActivity::class.java)
         intentBackToLoginActivity = Intent(this@RegisterActivity, LoginActivity::class.java)
 
         binding.btRegister.setOnClickListener {
@@ -45,9 +46,9 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
-        viewModel.registerResponse.observe(this) {event->
-            if(!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let { resource->
+        viewModel.registerResponse.observe(this) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
                     when (resource) {
 
                         is Resource.Loading -> {
@@ -65,10 +66,13 @@ class RegisterActivity : AppCompatActivity() {
 
                         is Resource.Error -> {
                             binding.rlLoading.invisible()
-                            Toast.makeText(this@RegisterActivity, "Check the information again!!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                "Check the information again!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
-                        else -> {}
                     }
                 }
             }

@@ -5,6 +5,8 @@ import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.BaseAuthImpl
 import com.example.superwolffirebase.api.CreateNewRoom
 import com.example.superwolffirebase.api.CreateNewRoomImpl
+import com.example.superwolffirebase.api.JoinLeaveRoom
+import com.example.superwolffirebase.api.JoinLeaveRoomImpl
 import com.example.superwolffirebase.api.SetUpProfile
 import com.example.superwolffirebase.api.SetUpProfileImpl
 import com.example.superwolffirebase.manager.SharePrefManager
@@ -49,7 +51,9 @@ object Module {
     @Singleton
     fun provideCreateNewRoomRepository(impl: CreateNewRoomImpl): CreateNewRoom = impl
 
-
+    @Provides
+    @Singleton
+    fun provideJoinLeaveRoomRepository(impl: JoinLeaveRoomImpl): JoinLeaveRoom = impl
 
     @Provides
     @Singleton

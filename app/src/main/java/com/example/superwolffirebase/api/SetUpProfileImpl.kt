@@ -1,7 +1,7 @@
 package com.example.superwolffirebase.api
 
 import android.net.Uri
-import com.example.superwolffirebase.models.Player
+import com.example.superwolffirebase.model.Player
 import com.example.superwolffirebase.other.Resource
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DatabaseReference

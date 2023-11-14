@@ -6,10 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.SetUpProfile
-import com.example.superwolffirebase.models.Player
+import com.example.superwolffirebase.model.Player
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel

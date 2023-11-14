@@ -45,7 +45,6 @@ class ProfileFragment : Fragment() {
         binding.profileLogout.setOnClickListener {
             val action = ProfileFragmentDirections.actionProfileFragmentToConfirmLogOutDialog()
             Navigation.findNavController(binding.root).navigate(action)
-
         }
 
 

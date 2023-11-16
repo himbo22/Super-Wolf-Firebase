@@ -30,7 +30,6 @@ class JoinLeaveRoomImpl @Inject constructor(
         id: String,
         avatar: String,
         playerName: String,
-        cardinalNumber: Int,
         role: String
     ): Event<Resource<DatabaseReference>> {
         return suspendCoroutine { continuation ->
@@ -55,10 +54,10 @@ class JoinLeaveRoomImpl @Inject constructor(
                             id,
                             avatar,
                             playerName,
-                            currentData?.child("amount")?.getValue(Int::class.java) ?: 0,
-                            ""
+                            "",
+                            false
                         )
-                        reference.child("player/${id}").setValue(player)
+                        reference.child("players/${id}").setValue(player)
                         continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
                     } else {
                         continuation.resume(Event(Resource.Error(Exception("Failed to join room"))))

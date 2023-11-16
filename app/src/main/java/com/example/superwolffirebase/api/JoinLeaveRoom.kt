@@ -12,7 +12,6 @@ interface JoinLeaveRoom {
         id: String,
         avatar: String,
         playerName: String,
-        cardinalNumber: Int,
         role: String
     ): Event<Resource<DatabaseReference>>
 

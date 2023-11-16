@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.FragmentProfileBinding
 import com.example.superwolffirebase.other.Resource
@@ -22,6 +23,7 @@ import com.example.superwolffirebase.views.mainscreen.activities.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 
+@GlideModule
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
@@ -72,7 +74,6 @@ class ProfileFragment : Fragment() {
 
                         is Resource.Error -> {
                             binding.rlLoading.invisible()
-                            showLog(resource.exception.toString())
                         }
 
                     }

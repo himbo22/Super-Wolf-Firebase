@@ -9,6 +9,7 @@
     <string name="create_account">Create account</string>
     <string name="register">REGISTER</string>
     <string name="name">NAME</string>
+    <string name="name2">NAME:</string>
     <string name="already_have_an_account">Already have an account</string>
     <string name="play">PLAY</string>
     <string name="gender">GENDER</string>
@@ -35,4 +36,7 @@
     <string name="room_name">ROOM NAME</string>
     <string name="_6_9">6/9</string>
     <string name="_1">1</string>
+    <string name="_00_00">00:00</string>
+    <string name="message">MESSAGE</string>
+    <string name="type_your_message">Type your message</string>
 </resources>

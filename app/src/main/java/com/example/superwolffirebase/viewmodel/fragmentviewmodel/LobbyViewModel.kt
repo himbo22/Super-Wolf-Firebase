@@ -43,9 +43,8 @@ class LobbyViewModel @Inject constructor(
                  id: String,
                  avatar: String,
                  playerName : String,
-                 cardinalNumber: Int,
                  role: String) = viewModelScope.launch {
-        val result = joinRoom.joinRoom(roomName, amount,id, avatar, playerName, cardinalNumber, role)
+        val result = joinRoom.joinRoom(roomName, amount,id, avatar, playerName, role)
         _joinRoomResult.postValue(result)
     }
 
@@ -57,6 +56,7 @@ class LobbyViewModel @Inject constructor(
                 val roomListTemp = arrayListOf<Room>()
                 if (snapshot.exists()){
                     for (roomSnap in snapshot.children){
+                        
                         val room = roomSnap.getValue(Room::class.java)
                         if (room != null){
                             roomListTemp.add(room)

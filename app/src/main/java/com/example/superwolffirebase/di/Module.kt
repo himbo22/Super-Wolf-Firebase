@@ -1,12 +1,15 @@
 package com.example.superwolffirebase.di
 
 import android.content.SharedPreferences
+import androidx.recyclerview.widget.RecyclerView
 import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.BaseAuthImpl
 import com.example.superwolffirebase.api.CreateNewRoom
 import com.example.superwolffirebase.api.CreateNewRoomImpl
 import com.example.superwolffirebase.api.JoinLeaveRoom
 import com.example.superwolffirebase.api.JoinLeaveRoomImpl
+import com.example.superwolffirebase.api.SendMessage
+import com.example.superwolffirebase.api.SendMessageImpl
 import com.example.superwolffirebase.api.SetUpProfile
 import com.example.superwolffirebase.api.SetUpProfileImpl
 import com.example.superwolffirebase.manager.SharePrefManager
@@ -57,7 +60,13 @@ object Module {
 
     @Provides
     @Singleton
+    fun provideSendMessageRepository(impl: SendMessageImpl): SendMessage = impl
+
+
+    @Provides
+    @Singleton
     fun provideSharedPreferences(
         sharePrefManager: SharePrefManager
     ): SharedPreferences = sharePrefManager.getSharePref()
+
 }

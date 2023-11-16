@@ -38,7 +38,7 @@ class ProfileViewModel @Inject constructor(
         name: String,
         gender: String,
         email: String,
-        ) = viewModelScope.launch(Dispatchers.IO) {
+    ) = viewModelScope.launch(Dispatchers.IO) {
         _updateProfile.postValue(Resource.Loading)
         val result = async {
             setUpRepository.uploadProfile(uri, id, name, gender, email)
@@ -53,7 +53,8 @@ class ProfileViewModel @Inject constructor(
             if (currentPlayer != null) {
                 firebaseDatabase.getReference("players").child(currentPlayer.uid).get()
                     .addOnSuccessListener {
-                        try {
+
+                        if (it.exists()) {
                             val player = Player(
                                 currentPlayer.uid,
                                 it.child("name").value as String,
@@ -62,7 +63,7 @@ class ProfileViewModel @Inject constructor(
                                 it.child("email").value as String,
                             )
                             _playerInfo.postValue(Event(Resource.Success(player)))
-                        } catch (e: Exception) {
+                        } else {
                             _playerInfo.postValue(
                                 Event(
                                     Resource.Success(
@@ -78,12 +79,11 @@ class ProfileViewModel @Inject constructor(
                             )
                         }
                     }
-                    .addOnFailureListener {
-                        _playerInfo.postValue(Event(Resource.Error(it)))
-                    }
+
             }
 
         }
+
     }
 
     fun logOut() {

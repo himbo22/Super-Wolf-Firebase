@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.adapter.OnItemClickListener
 import com.example.superwolffirebase.adapter.RoomAdapter
 import com.example.superwolffirebase.databinding.FragmentLobbyBinding
@@ -81,6 +82,8 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 is Resource.Error -> {
 
                 }
+
+                else -> {}
             }
         }
 
@@ -106,28 +109,26 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 else -> {}
             }
         }
+
+
     }
 
     override fun onItemClick(room: Room) {
         val player = args.player
-        var newCardinalNumber = (room.amount!! )
-        newCardinalNumber += 1
         viewModel.joinRoom(
             room.name!!,
             room.amount!!,
             player.id!!,
             player.avatar!!,
             player.name!!,
-            newCardinalNumber,
             ""
         )
-
         viewModel.joinRoomResult.observe(viewLifecycleOwner){event->
             if (!event.hasBeenHandled){
                 event.getContentIfNotHandled()?.let {resource ->
                     when(resource){
                         is Resource.Success -> {
-                            val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(player, room)
+                            val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(args.player, room)
                             findNavController().navigate(action)
                         }
 
@@ -136,7 +137,6 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 }
             }
         }
-
     }
 
 

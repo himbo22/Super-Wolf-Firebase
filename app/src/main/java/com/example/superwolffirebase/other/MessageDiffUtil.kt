@@ -1,12 +1,13 @@
 package com.example.superwolffirebase.other
 
 import androidx.recyclerview.widget.DiffUtil
+import com.example.superwolffirebase.model.MessageRequest
 import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.model.Room
 
-class PlayDiffUtil(
-    private val oldList: List<PlayerInGame>,
-    private val newList: List<PlayerInGame>
+class MessageDiffUtil(
+    private val oldList: List<MessageRequest>,
+    private val newList: List<MessageRequest>
 ): DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldList.size
@@ -17,24 +18,22 @@ class PlayDiffUtil(
     }
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].id == newList[newItemPosition].id
+        return oldList[oldItemPosition].time == newList[newItemPosition].time
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return when{
 
-            oldList[oldItemPosition].name != newList[newItemPosition].name -> {
+            oldList[oldItemPosition].time != newList[newItemPosition].time -> {
                 false
             }
-            oldList[oldItemPosition].id != newList[newItemPosition].id -> {
+            oldList[oldItemPosition].playerName != newList[newItemPosition].playerName -> {
                 false
             }
-            oldList[oldItemPosition].avatar != newList[newItemPosition].avatar -> {
+            oldList[oldItemPosition].time != newList[newItemPosition].time -> {
                 false
             }
-            oldList[oldItemPosition].role != newList[newItemPosition].role -> {
-                false
-            }
+
 
             else -> true
         }

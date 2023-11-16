@@ -16,4 +16,5 @@
     <color name="rgb2">#FF6666</color>
     <color name="rgb3">#6699CC</color>
     <color name="grey">#808080</color>
+    <color name="night">#2e3233</color>
 </resources>

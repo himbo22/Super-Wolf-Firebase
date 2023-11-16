@@ -14,14 +14,22 @@ import com.example.superwolffirebase.other.MyDiffUtil
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.views.mainscreen.fragments.LobbyFragmentDirections
 
-class RoomAdapter(private val player: Player, private val listener: OnItemClickListener) : RecyclerView.Adapter<RoomAdapter.MyViewHolder>() {
+class RoomAdapter(private val player: Player, private val listener: OnItemClickListener) :
+    RecyclerView.Adapter<RoomAdapter.MyViewHolder>() {
 
     private var oldRoomList = emptyList<Room>()
 
-    inner class MyViewHolder(val binding: ItemListLobbyBinding): RecyclerView.ViewHolder(binding.root)
+    inner class MyViewHolder(val binding: ItemListLobbyBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        return MyViewHolder(ItemListLobbyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return MyViewHolder(
+            ItemListLobbyBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
@@ -38,12 +46,13 @@ class RoomAdapter(private val player: Player, private val listener: OnItemClickL
                 room.setOnClickListener {
                     listener.onItemClick(currentRoom)
                 }
+
             }
         }
 
     }
 
-    fun setData(newRoomList: List<Room>){
+    fun setData(newRoomList: List<Room>) {
         val diffUtil = MyDiffUtil(oldRoomList, newRoomList)
         val diffResult = DiffUtil.calculateDiff(diffUtil)
         oldRoomList = newRoomList
@@ -52,6 +61,6 @@ class RoomAdapter(private val player: Player, private val listener: OnItemClickL
 
 }
 
-interface OnItemClickListener{
+interface OnItemClickListener {
     fun onItemClick(room: Room)
 }

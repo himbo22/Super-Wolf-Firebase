@@ -17,4 +17,5 @@
     <color name="rgb3">#6699CC</color>
     <color name="grey">#808080</color>
     <color name="night">#2e3233</color>
+    <color name="soft_red">#f73e7d</color>
 </resources>

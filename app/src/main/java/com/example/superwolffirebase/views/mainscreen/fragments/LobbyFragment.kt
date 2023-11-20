@@ -128,8 +128,10 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 event.getContentIfNotHandled()?.let {resource ->
                     when(resource){
                         is Resource.Success -> {
-                            val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(args.player, room)
-                            findNavController().navigate(action)
+                            resource.result.let{
+                                val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(room, args.player)
+                                findNavController().navigate(action)
+                            }
                         }
 
                         else -> {}

@@ -13,6 +13,7 @@ import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.MyDiffUtil
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.views.mainscreen.fragments.LobbyFragmentDirections
+import kotlinx.coroutines.delay
 
 class RoomAdapter(private val player: Player, private val listener: OnItemClickListener) :
     RecyclerView.Adapter<RoomAdapter.MyViewHolder>() {
@@ -43,6 +44,7 @@ class RoomAdapter(private val player: Player, private val listener: OnItemClickL
             binding.apply {
                 roomName.text = currentRoom.name
                 totalPlayer.text = "${currentRoom.amount}/9"
+
                 room.setOnClickListener {
                     listener.onItemClick(currentRoom)
                 }

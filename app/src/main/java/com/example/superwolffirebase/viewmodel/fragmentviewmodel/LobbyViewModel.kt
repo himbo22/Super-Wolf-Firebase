@@ -7,6 +7,7 @@ import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.CreateNewRoom
 import com.example.superwolffirebase.api.JoinLeaveRoom
 import com.example.superwolffirebase.model.Player
+import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
@@ -34,7 +35,7 @@ class LobbyViewModel @Inject constructor(
     val newRoom get() = _newRoom
     private var _allRoom = MutableLiveData<Resource<List<Room>>>()
     val allRoom get() = _allRoom
-    private val _joinRoomResult = MutableLiveData<Event<Resource<DatabaseReference>>>()
+    private val _joinRoomResult = MutableLiveData<Event<Resource<PlayerInGame>>>()
     val joinRoomResult get() = _joinRoomResult
 
 

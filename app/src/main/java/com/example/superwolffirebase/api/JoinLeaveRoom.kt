@@ -1,6 +1,7 @@
 package com.example.superwolffirebase.api
 
 import com.example.superwolffirebase.model.Player
+import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
 import com.google.firebase.database.DatabaseReference
@@ -13,7 +14,7 @@ interface JoinLeaveRoom {
         avatar: String,
         playerName: String,
         role: String
-    ): Event<Resource<DatabaseReference>>
+    ): Event<Resource<PlayerInGame>>
 
     suspend fun leaveRoom(
         roomName: String,

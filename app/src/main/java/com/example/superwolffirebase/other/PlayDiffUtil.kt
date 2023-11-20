@@ -35,6 +35,15 @@ class PlayDiffUtil(
             oldList[oldItemPosition].role != newList[newItemPosition].role -> {
                 false
             }
+            oldList[oldItemPosition].exposed != newList[newItemPosition].exposed -> {
+                false
+            }
+            oldList[oldItemPosition].vote != newList[newItemPosition].vote -> {
+                false
+            }
+            oldList[oldItemPosition].voted != newList[newItemPosition].voted -> {
+                false
+            }
 
             else -> true
         }

@@ -15,12 +15,15 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.annotation.Nullable
 import javax.inject.Inject
-import kotlin.Exception
 
 
 @HiltViewModel
@@ -38,7 +41,31 @@ class PlayViewModel @Inject constructor(
     val sendMessResult get() = _sendMessResult
     private val _allMessage = MutableLiveData<Event<Resource<List<MessageRequest>>>>()
     val allMessage get() = _allMessage
+    private val _votePlayer = MutableLiveData<Event<Resource<Void>>>()
+    val votePlayer get() = _votePlayer
+    private val _getPlayerInGame = MutableLiveData<Event<Resource<PlayerInGame>>>()
+    val getPlayerInGame get() = _getPlayerInGame
 
+
+    fun getPlayerInGame(id: String, roomName: String){
+        firebaseDatabase.getReference("rooms/${roomName}/players/${id}").addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    val playerInGame = snapshot.getValue<PlayerInGame>()
+                    if (playerInGame != null){
+                        _getPlayerInGame.postValue(Event(Resource.Success(playerInGame)))
+                    } else {
+                        _getPlayerInGame.postValue(Event(Resource.Error(Exception("No data"))))
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
 
     fun sendMessage(
         roomName: String,
@@ -49,6 +76,17 @@ class PlayViewModel @Inject constructor(
         _sendMessResult.postValue(result)
     }
 
+    fun votePlayer(avatar: String, roomName: String, uid: String) {
+        firebaseDatabase.getReference("rooms/${roomName}/players/${uid}").updateChildren(
+            mapOf(
+                "vote" to avatar
+            )
+        ).addOnSuccessListener {
+            _votePlayer.postValue(Event(Resource.Success(it)))
+        }.addOnFailureListener {
+            _votePlayer.postValue(Event(Resource.Error(Exception("ASD"))))
+        }
+    }
 
     fun getAllMessages(roomName: String) {
         firebaseDatabase.getReference("messages/${roomName}")
@@ -56,10 +94,10 @@ class PlayViewModel @Inject constructor(
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val messageList = arrayListOf<MessageRequest>()
 
-                    if (snapshot.exists()){
-                        for (item in snapshot.children){
+                    if (snapshot.exists()) {
+                        for (item in snapshot.children) {
                             val message = item.getValue(MessageRequest::class.java)
-                            if (message != null){
+                            if (message != null) {
                                 messageList.add(message)
                             }
                         }
@@ -81,8 +119,10 @@ class PlayViewModel @Inject constructor(
     fun getAllPlayers(name: String) {
         firebaseDatabase.getReference("rooms/${name}/players")
             .addValueEventListener(object : ValueEventListener {
-                val playerList = arrayListOf<PlayerInGame>()
                 override fun onDataChange(snapshot: DataSnapshot) {
+
+                    val playerList = arrayListOf<PlayerInGame>()
+
                     if (snapshot.exists()) {
                         for (item in snapshot.children) {
                             val player = item.getValue(PlayerInGame::class.java)

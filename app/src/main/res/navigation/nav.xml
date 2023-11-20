@@ -102,12 +102,15 @@
         <action
             android:id="@+id/action_playFragment_to_lobbyFragment"
             app:destination="@id/lobbyFragment" />
-        <argument
-            android:name="player"
-            app:argType="com.example.superwolffirebase.model.Player" />
+
         <argument
             android:name="room"
             app:argType="com.example.superwolffirebase.model.Room" />
+
+        <argument
+            android:name="player"
+            app:argType="com.example.superwolffirebase.model.Player" />
+
     </fragment>
 
 </navigation>

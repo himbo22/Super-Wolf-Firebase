@@ -43,7 +43,6 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.haveAccount.setOnClickListener {
             startActivity(intentBackToLoginActivity)
-            finish()
         }
 
         viewModel.registerResponse.observe(this) { event ->
@@ -61,7 +60,6 @@ class RegisterActivity : AppCompatActivity() {
                             intentToSetUpProfileActivity.putExtra("email", resource.result.email)
                             intentToSetUpProfileActivity.putExtra("name", resource.result.displayName)
                             startActivity(intentToSetUpProfileActivity)
-                            finish()
                         }
 
                         is Resource.Error -> {

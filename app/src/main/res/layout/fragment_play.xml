@@ -16,8 +16,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/menu"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/time"
+        android:id="@+id/timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/_00_00"
@@ -26,16 +34,65 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/player_list"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ready"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ready"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        app:layout_constraintBottom_toTopOf="@id/player_list"
+        app:layout_constraintEnd_toStartOf="@id/timer"
+        app:layout_constraintStart_toStartOf="@id/getback"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/img_day_night"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/daynight"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/days"
+            android:layout_marginEnd="0.5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/_1"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/img_day_night"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/nights"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:text="@string/_1"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/img_day_night"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/player_list"
-        android:nestedScrollingEnabled="false"
         android:layout_width="match_parent"
         android:layout_height="340dp"
         android:foregroundGravity="center"
+        android:nestedScrollingEnabled="false"
         app:layout_constraintBottom_toTopOf="@id/messageList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,24 +102,24 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messageList"
-        android:background="@drawable/custom_linear_layout"
-        android:overScrollMode="always"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/player_list"
-        app:layout_constraintBottom_toTopOf="@id/input"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="5dp"
         android:layout_margin="1dp"
         android:layout_marginBottom="2dp"
+        android:background="@drawable/custom_linear_layout"
+        android:overScrollMode="always"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@id/input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/player_list"
         tools:listitem="@layout/item_message" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/input"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,9 +138,9 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_message"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
-            android:layout_height="match_parent"
             android:background="@null"
             android:hint="@string/type_your_message"
             android:theme="@style/TextInputLayoutStyle"

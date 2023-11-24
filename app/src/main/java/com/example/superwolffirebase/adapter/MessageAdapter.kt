@@ -30,6 +30,11 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() 
             binding.apply {
                 itemName.text = "${currentMessage.playerName.toString()}:"
                 itemMessage.text = currentMessage.message.toString()
+
+
+
+
+
             }
         }
     }

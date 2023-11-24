@@ -129,7 +129,7 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                     when(resource){
                         is Resource.Success -> {
                             resource.result.let{
-                                val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(room, args.player)
+                                val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(room,args.player, it)
                                 findNavController().navigate(action)
                             }
                         }

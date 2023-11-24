@@ -39,18 +39,7 @@ class JoinLeaveRoomImpl @Inject constructor(
                 override fun doTransaction(currentData: MutableData): Transaction.Result {
                     val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
                     currentData.child("amount").value = currentAmount + 1
-                    val player = PlayerInGame(
-                        id,
-                        avatar,
-                        playerName,
-                        "",
-                        false,
-                        "",
-                        0
-                    )
 
-                    reference.child("players/${id}").setValue(player)
-                    continuation.resume(Event(Resource.Success(player)))
                     return Transaction.success(currentData)
                 }
 
@@ -62,6 +51,21 @@ class JoinLeaveRoomImpl @Inject constructor(
                     if (committed && error == null) {
                         // the transaction was successful
                         // perform additional here
+                        val player = PlayerInGame(
+                            id,
+                            avatar,
+                            playerName,
+                            "",
+                            false,
+                            "",
+                            0,
+                            false,
+                            null,
+                            false
+                        )
+
+                        reference.child("players/${id}").setValue(player)
+                        continuation.resume(Event(Resource.Success(player)))
 
                     } else {
                         continuation.resume(Event(Resource.Error(Exception("Failed to join room"))))

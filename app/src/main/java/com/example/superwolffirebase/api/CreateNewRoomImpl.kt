@@ -17,7 +17,7 @@ class CreateNewRoomImpl  @Inject constructor(
     override suspend fun createNewRoom(name: String): Resource<DatabaseReference> {
         return suspendCoroutine { continuation ->
             val reference = firebaseDatabase.reference.child("rooms")
-            val room = Room(name, 0)
+            val room = Room(name, 0, 0, 0, false)
             reference.child(name).setValue(room)
                 .addOnCompleteListener {
                     continuation.resume(Resource.Success(firebaseDatabase.reference))

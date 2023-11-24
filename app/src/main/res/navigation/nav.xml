@@ -110,6 +110,9 @@
         <argument
             android:name="player"
             app:argType="com.example.superwolffirebase.model.Player" />
+        <argument
+            android:name="playerInGame"
+            app:argType="com.example.superwolffirebase.model.PlayerInGame" />
 
     </fragment>
 

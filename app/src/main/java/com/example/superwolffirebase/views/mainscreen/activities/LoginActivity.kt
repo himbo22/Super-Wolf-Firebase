@@ -36,7 +36,6 @@ class LoginActivity : AppCompatActivity() {
 
         binding.createAccount.setOnClickListener {
             startActivity(intentToRegisterActivity)
-            finish()
         }
 
         viewModel.loginResponse.observe(this) {event->
@@ -50,7 +49,6 @@ class LoginActivity : AppCompatActivity() {
                             binding.rlLoading.invisible()
                             Toast.makeText(this@LoginActivity, "Ok", Toast.LENGTH_SHORT).show()
                             startActivity(intentToMainScreenActivity)
-                            finish()
                         }
 
                         is Resource.Error -> {

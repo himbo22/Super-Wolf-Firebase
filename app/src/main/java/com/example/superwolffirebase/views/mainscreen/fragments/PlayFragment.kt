@@ -1,6 +1,7 @@
 package com.example.superwolffirebase.views.mainscreen.fragments
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,30 +23,33 @@ import com.example.superwolffirebase.databinding.ItemPlayerBinding
 import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.hideKeyboard
+import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.viewmodel.fragmentviewmodel.PlayViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.time.ExperimentalTime
 
 
 @GlideModule
-
 @AndroidEntryPoint
 class PlayFragment : Fragment(), OnItemClick {
     private var _binding: FragmentPlayBinding? = null
-    private var _itemPlayerBinding: ItemPlayerBinding? = null
     private val binding get() = _binding!!
-    private val itemPlayerBinding get() = _itemPlayerBinding!!
     private val args by navArgs<PlayFragmentArgs>()
     private val viewModel by viewModels<PlayViewModel>()
     private lateinit var playAdapter: PlayAdapter
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var playerInGame: PlayerInGame
+    private lateinit var timer: CountDownTimer
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
+
+
 
 
 
@@ -65,47 +69,102 @@ class PlayFragment : Fragment(), OnItemClick {
         return binding.root
     }
 
-    private fun setUpView(){
+    private fun setUpView() {
+
+        binding.ready.setOnClickListener {
+            viewModel.ready(args.room.name!!, args.player.id!!)
+        }
+
         binding.getback.setOnClickListener {
             viewModel.leaveRoom(args.room.name!!, args.room.amount!!, args.player.id!!)
         }
 
+
         binding.send.setOnClickListener {
-            if (binding.etMessage.text.isNullOrBlank()){
+            if (binding.etMessage.text.isNullOrBlank()) {
                 return@setOnClickListener
             } else {
                 val message = binding.etMessage.text.toString()
                 viewModel.sendMessage(args.room.name!!, message, args.player.name!!)
             }
         }
+
+
+
+
     }
 
 
-
-    private fun setUpViewModel(){
-        viewModel.getAllPlayers(args.room.name!!)
+    private fun setUpViewModel() {
+        viewModel.getAllPlayers(args.room.name!!, args.player.id!!)
         viewModel.getAllMessages(args.room.name!!)
         viewModel.getPlayerInGame(args.player.id!!, args.room.name!!)
+        viewModel.getRoom(args.room.name!!)
+        viewModel.prepareToStartGame(args.room.name!!)
 
-        viewModel.votePlayer.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let {resource ->
-                    when(resource){
+
+
+
+        viewModel.prepareToStartGame.observe(viewLifecycleOwner){resource->
+
+            when(resource){
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "yes sir", Toast.LENGTH_SHORT).show()
+                    viewModel.startGame(args.room.name!!)
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(),"resource.exception.message", Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.readyStatus.observe(viewLifecycleOwner){resource->
+            when(resource){
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "Waiting for other people!!", Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+
+
+
+        viewModel.timeCountDown.observe(viewLifecycleOwner){resource->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.timer.text = resource.result
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
+            }
+        }
+
+
+        viewModel.getRoom.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource){
                         is Resource.Success -> {
-                            Toast.makeText(requireContext(), playerInGame.vote, Toast.LENGTH_SHORT).show()
+                            playAdapter.setRoom(resource.result)
+                            binding.ready.isClickable = resource.result.gameStarted != true
+                            binding.days.text = resource.result.days.toString()
+                            binding.nights.text = resource.result.nights.toString()
                         }
 
-                        else -> {}
-                    }
-                }
-            }}
+                        is Resource.Error -> {
 
-        viewModel.getPlayerInGame.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let {resource ->
-                    when(resource){
-                        is Resource.Success -> {
-                            playerInGame = resource.result
                         }
 
                         else -> {}
@@ -114,15 +173,49 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.allMessage.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let{resource->
-                    when(resource){
+        viewModel.votePlayer.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+
+        viewModel.getPlayerInGame.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
                         is Resource.Success -> {
                             resource.result.let {
-                               messageAdapter.setData(it)
+//                                if (it.role == ""){
+//                                    binding.skill.invisible()
+//                                }
                             }
                         }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        viewModel.allMessage.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            resource.result.let {
+                                messageAdapter.setData(it)
+                            }
+                        }
+
                         is Resource.Error -> {
                         }
 
@@ -135,11 +228,12 @@ class PlayFragment : Fragment(), OnItemClick {
 
         viewModel.leaveRoomResult.observe(viewLifecycleOwner) { event ->
             if (!event?.hasBeenHandled!!) {
-                event.getContentIfNotHandled()?.let{resource->
-                    when(resource){
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
 
                         is Resource.Success -> {
-                            val action = PlayFragmentDirections.actionPlayFragmentToLobbyFragment(args.player)
+                            val action =
+                                PlayFragmentDirections.actionPlayFragmentToLobbyFragment(args.player)
                             findNavController().navigate(action)
                         }
 
@@ -150,15 +244,16 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.allPlayer.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let{resource->
-                    when(resource){
+        viewModel.allPlayer.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
                         is Resource.Success -> {
                             resource.result.let {
                                 playAdapter.setData(it)
                             }
                         }
+
                         is Resource.Error -> {
                             Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
                         }
@@ -169,8 +264,8 @@ class PlayFragment : Fragment(), OnItemClick {
                 }
             }
         }
-        viewModel.sendMessResult.observe(viewLifecycleOwner){resource->
-            when(resource){
+        viewModel.sendMessResult.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
                 is Resource.Success -> {
                     hideKeyboard()
                     binding.etMessage.setText("")
@@ -181,11 +276,12 @@ class PlayFragment : Fragment(), OnItemClick {
         }
     }
 
-    private fun setUpPlayerList(){
+    private fun setUpPlayerList() {
 
-        playAdapter = PlayAdapter( args.player.id!!,this, args.room.name!!)
+        playAdapter = PlayAdapter(args.playerInGame.id!!, this)
 
-        binding.playerList.layoutManager = GridLayoutManager(requireContext(), 3, LinearLayoutManager.VERTICAL, false)
+        binding.playerList.layoutManager =
+            GridLayoutManager(requireContext(), 3, LinearLayoutManager.VERTICAL, false)
         binding.playerList.adapter = playAdapter
         binding.playerList.setHasFixedSize(true)
 
@@ -201,8 +297,13 @@ class PlayFragment : Fragment(), OnItemClick {
         _binding = null
     }
 
-    override fun vote(id: String, currentPlayer: PlayerInGame, roomName: String) {
-        viewModel.votePlayer(currentPlayer.avatar!!,roomName,id)
+    override fun vote(currentPlayer: PlayerInGame) {
+        viewModel.votePlayer(
+            currentPlayer.avatar!!,
+            args.room.name!!,
+            args.playerInGame.id!!,
+            currentPlayer.id!!
+        )
     }
 
     override fun unVote(player: PlayerInGame, roomName: String) {

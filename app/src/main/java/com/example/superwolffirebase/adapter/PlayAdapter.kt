@@ -16,13 +16,18 @@ import com.example.superwolffirebase.databinding.ItemPlayerBinding
 import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Constant
+import com.example.superwolffirebase.other.Constant.GUARD
+import com.example.superwolffirebase.other.Constant.SEER
+import com.example.superwolffirebase.other.Constant.VILLAGER
 import com.example.superwolffirebase.other.Constant.WEREWOLF
+import com.example.superwolffirebase.other.Constant.WITCH
 import com.example.superwolffirebase.other.OneRoomDiffUtil
 import com.example.superwolffirebase.other.PlayDiffUtil
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.utils.showLog
 import okhttp3.internal.notify
+import kotlin.math.log
 
 
 @GlideModule
@@ -67,27 +72,45 @@ class PlayAdapter(
 
 
 
-                playerView.setOnClickListener {
-                    listener.vote(currentPlayer)
+
+                if (room.gameEnded == true) {
+                    playerRole.show()
                 }
 
+                if (room.isDay == true) { // day
+                    playerView.setOnClickListener {
+                        when (me.voteId) {
+                            "" -> {
+                                listener.vote(currentPlayer)
+                            }
+                            currentPlayer.id -> {
+                                listener.unVote(currentPlayer)
+                            }
+                            else -> {
+                                listener.changeVote(currentPlayer)
+                            }
+                        }
+                    }
+                } else { // night
+                    when (me.role) {
+                        SEER -> {
 
-                if (room.gameStarted == true) {
+                        }
 
-                    ready.invisible()
-                } else {
-                    if (currentPlayer.ready == true) {
-                        ready.show()
-                    } else {
-                        ready.invisible()
+                        GUARD -> {
+
+                        }
+
+                        WITCH -> {
+
+                        }
+
+                        WEREWOLF -> {
+
+                        }
+
                     }
                 }
-
-//                if (currentPlayer.ready == true) {
-//                    ready.show()
-//                } else {
-//                    ready.invisible()
-//                }
 
 
                 if (currentPlayer.voted != 0) {
@@ -97,16 +120,13 @@ class PlayAdapter(
                     constraintVoted.invisible()
                 }
 
-                if (currentPlayer.vote.isNullOrBlank().not()) {
+                if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
                     constraintVote.show()
-                    Glide.with(avatarVote.context).load(currentPlayer.vote).into(avatarVote)
+                    Glide.with(avatarVote.context).load(currentPlayer.voteAvatar).into(avatarVote)
                 } else {
                     constraintVote.invisible()
                 }
 
-                if (currentPlayer.expose == true) {
-                    role.show()
-                }
 
                 if (currentPlayer.dead == true) {
                     playerView.isClickable = false
@@ -114,14 +134,66 @@ class PlayAdapter(
                     playAvatar.setImageResource(R.drawable.rip)
                 } else {
                     Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
-
                 }
 
-                if (currentPlayer.isShowRole == true) {
-                    role.show()
-                    role.setImageResource(R.drawable.werewolf_icon)
-                } else if (me.role == "") {
-                    role.invisible()
+
+                if (room.gameStarted == true) {
+                    playerView.isClickable = true
+                    ready.invisible()
+                } else {
+                    playerView.isClickable = false
+                    if (currentPlayer.ready == true) {
+                        ready.show()
+                    } else {
+                        ready.invisible()
+                    }
+                }
+
+
+
+
+
+
+                if (currentPlayer == me) {
+                    when (currentPlayer.role) {
+                        SEER -> {
+                            playerRole.show()
+                            playerRole.setImageResource(R.drawable.seer)
+                        }
+
+                        WITCH -> {
+                            playerRole.show()
+                            playerRole.setImageResource(R.drawable.witch)
+                        }
+
+                        GUARD -> {
+                            playerRole.show()
+                            playerRole.setImageResource(R.drawable.shield)
+                        }
+
+                        VILLAGER -> {
+                            playerRole.show()
+                            playerRole.setImageResource(R.drawable.villager)
+                        }
+
+                        WEREWOLF -> {
+                            playerRole.show()
+                            playerRole.setImageResource(R.drawable.werewolf_icon)
+                        }
+
+                        else -> {
+                            playerRole.invisible()
+                        }
+                    }
+                } else {
+                    if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) {
+                        showLog("1")
+                        playerRole.show()
+                        playerRole.setImageResource(R.drawable.werewolf_icon)
+                    } else {
+                        playerRole.invisible()
+                    }
+
                 }
 
 
@@ -156,7 +228,7 @@ class PlayAdapter(
 
 interface OnItemClick {
     fun vote(currentPlayer: PlayerInGame)
-    fun unVote(player: PlayerInGame, roomName: String)
-    fun changeVote(player: PlayerInGame, roomName: String)
+    fun unVote(currentPlayer: PlayerInGame)
+    fun changeVote(currentPlayer: PlayerInGame)
 }
 

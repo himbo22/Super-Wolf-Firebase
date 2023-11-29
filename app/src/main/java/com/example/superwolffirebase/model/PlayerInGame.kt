@@ -10,9 +10,9 @@ data class PlayerInGame(
     var name: String? = null,
     var role: String? = null,
     var dead: Boolean? = null,
-    var vote: String? = null,
+    var voteAvatar: String? = null,
+    var voteId: String? = null,
     var voted: Int? = null,
-    var isShowRole: Boolean? = null,
     var expose: Boolean? = null,
-    var ready: Boolean? = null
+    var ready: Boolean? = null,
 ) : Parcelable

@@ -9,5 +9,8 @@ data class Room(
     var amount: Int? = null,
     var days: Int? = null,
     var nights: Int? = null,
-    var gameStarted: Boolean? = null
+    var gameStarted: Boolean? = null,
+    var isDay: Boolean? = null,
+    var gameEnded: Boolean? = null,
+    var remaining: Int? = null
 ) : Parcelable

@@ -1,5 +1,6 @@
 package com.example.superwolffirebase.views.mainscreen.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
@@ -21,12 +22,21 @@ import com.example.superwolffirebase.adapter.PlayAdapter
 import com.example.superwolffirebase.databinding.FragmentPlayBinding
 import com.example.superwolffirebase.databinding.ItemPlayerBinding
 import com.example.superwolffirebase.model.PlayerInGame
+import com.example.superwolffirebase.model.Room
+import com.example.superwolffirebase.other.Constant.GUARD
+import com.example.superwolffirebase.other.Constant.SEER
+import com.example.superwolffirebase.other.Constant.VILLAGER
+import com.example.superwolffirebase.other.Constant.WEREWOLF
+import com.example.superwolffirebase.other.Constant.WITCH
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.hideKeyboard
 import com.example.superwolffirebase.utils.invisible
+import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.viewmodel.fragmentviewmodel.PlayViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlin.time.ExperimentalTime
 
 
@@ -39,8 +49,6 @@ class PlayFragment : Fragment(), OnItemClick {
     private val viewModel by viewModels<PlayViewModel>()
     private lateinit var playAdapter: PlayAdapter
     private lateinit var messageAdapter: MessageAdapter
-    private lateinit var playerInGame: PlayerInGame
-    private lateinit var timer: CountDownTimer
 
 
     override fun onCreateView(
@@ -75,7 +83,7 @@ class PlayFragment : Fragment(), OnItemClick {
             viewModel.ready(args.room.name!!, args.player.id!!)
         }
 
-        binding.getback.setOnClickListener {
+        binding.getBack.setOnClickListener {
             viewModel.leaveRoom(args.room.name!!, args.room.amount!!, args.player.id!!)
         }
 
@@ -90,61 +98,116 @@ class PlayFragment : Fragment(), OnItemClick {
         }
 
 
-
-
     }
 
 
+    @SuppressLint("ResourceAsColor")
     private fun setUpViewModel() {
         viewModel.getAllPlayers(args.room.name!!, args.player.id!!)
         viewModel.getAllMessages(args.room.name!!)
         viewModel.getPlayerInGame(args.player.id!!, args.room.name!!)
         viewModel.getRoom(args.room.name!!)
         viewModel.prepareToStartGame(args.room.name!!)
+        viewModel.playersRemaining(args.room.name!!)
+        viewModel.startGame(args.room.name!!)
+//        viewModel.startGame.observe(viewLifecycleOwner){resource->
+//            when(resource){
+//                is Resource.Success -> {
+//                    viewModel.startNewDay(args.room.name!!)
+//                }
+//
+//                else -> {}
+//            }
+//        }
 
-
-
-
-        viewModel.prepareToStartGame.observe(viewLifecycleOwner){resource->
-
+        viewModel.startNewDay.observe(viewLifecycleOwner){resource->
             when(resource){
                 is Resource.Success -> {
-                    Toast.makeText(requireContext(), "yes sir", Toast.LENGTH_SHORT).show()
-                    viewModel.startGame(args.room.name!!)
+                    Toast.makeText(requireContext(), resource.result, Toast.LENGTH_SHORT).show()
+//                    binding.days.setTextColor(R.color.black)
+//                    binding.nights.setTextColor(R.color.black)
+//                    binding.timer.setTextColor(R.color.black)
+//                    binding.getBack.setColorFilter(R.color.black)
+//                    binding.menu.setColorFilter(R.color.black)
+//                    binding.screen.setBackgroundColor(R.color.white)
+                }
+                else -> {}
+            }
+        }
+
+        viewModel.startNewNight.observe(viewLifecycleOwner){resource->
+            when(resource){
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), resource.result, Toast.LENGTH_SHORT).show()
+//                    binding.days.setTextColor(R.color.white)
+//                    binding.nights.setTextColor(R.color.white)
+//                    binding.timer.setTextColor(R.color.white)
+//                    binding.getBack.setColorFilter(R.color.white)
+//                    binding.menu.setColorFilter(R.color.white)
+//                    binding.screen.setBackgroundColor(R.color.night)
+                }
+                else -> {}
+            }
+        }
+
+
+
+        viewModel.role.observe(viewLifecycleOwner){event->
+            if (!event.hasBeenHandled){
+                event.getContentIfNotHandled()?.let { resource ->
+                    when(resource){
+                        is Resource.Success -> {
+
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        viewModel.prepareToStartGame.observe(viewLifecycleOwner) { resource ->
+
+            when (resource) {
+                is Resource.Success -> {
+                    viewModel.autoPickRole(args.room.name!!)
+                }
+
+
+                else -> {}
+            }
+        }
+
+        viewModel.readyStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Waiting for other people!!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(requireContext(),"resource.exception.message", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 else -> {}
             }
         }
 
-        viewModel.readyStatus.observe(viewLifecycleOwner){resource->
-            when(resource){
-                is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Waiting for other people!!", Toast.LENGTH_SHORT).show()
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT).show()
-                }
-
-                else -> {}
-            }
-        }
 
 
-
-        viewModel.timeCountDown.observe(viewLifecycleOwner){resource->
+        viewModel.timeCountDown.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     binding.timer.text = resource.result
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 else -> {}
@@ -155,12 +218,15 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.getRoom.observe(viewLifecycleOwner) { event ->
             if (!event.hasBeenHandled) {
                 event.getContentIfNotHandled()?.let { resource ->
-                    when (resource){
+                    when (resource) {
                         is Resource.Success -> {
                             playAdapter.setRoom(resource.result)
                             binding.ready.isClickable = resource.result.gameStarted != true
                             binding.days.text = resource.result.days.toString()
                             binding.nights.text = resource.result.nights.toString()
+
+
+
                         }
 
                         is Resource.Error -> {
@@ -173,36 +239,66 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.votePlayer.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
+        viewModel.unVotePlayer.observe(viewLifecycleOwner){resource ->
+            when (resource) {
+                is Resource.Success -> {
 
-                        }
-
-                        else -> {}
-                    }
                 }
+
+                is Resource.Error -> {
+
+                }
+                else -> {}
             }
+
         }
 
 
-        viewModel.getPlayerInGame.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            resource.result.let {
-//                                if (it.role == ""){
-//                                    binding.skill.invisible()
-//                                }
+
+
+        viewModel.getPlayerInGame.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.result.let {
+                        when (it.role) {
+                            VILLAGER -> {
+                                binding.skill.show()
+                                binding.skill.setImageResource(R.drawable.villager)
+                            }
+
+                            WEREWOLF -> {
+                                binding.skill.show()
+                                binding.skill.setImageResource(R.drawable.werewolf_icon)
+                            }
+
+                            SEER -> {
+                                binding.skill.show()
+                                binding.skill.setImageResource(R.drawable.seer)
+                            }
+
+                            WITCH -> {
+                                binding.skill.show()
+                                binding.skill.setImageResource(R.drawable.witch)
+                            }
+
+                            GUARD -> {
+                                binding.skill.show()
+                                binding.skill.setImageResource(R.drawable.shield)
+                            }
+
+                            else -> {
+                                binding.skill.invisible()
                             }
                         }
-
-                        else -> {}
                     }
                 }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message!!)
+                }
+
+                else -> {}
+
             }
         }
 
@@ -306,11 +402,17 @@ class PlayFragment : Fragment(), OnItemClick {
         )
     }
 
-    override fun unVote(player: PlayerInGame, roomName: String) {
-        TODO("Not yet implemented")
+    override fun unVote(currentPlayer: PlayerInGame) {
+        viewModel.unVotePlayer(
+            args.room.name!!,
+            args.player.id!!,
+            currentPlayer.id!!
+        )
     }
 
-    override fun changeVote(player: PlayerInGame, roomName: String) {
-        TODO("Not yet implemented")
+    override fun changeVote(currentPlayer: PlayerInGame) {
+       viewModel.changeVotePlayer(args.room.name!!, args.player.id!!, currentPlayer.id!!, currentPlayer.avatar!!)
     }
+
+
 }

@@ -52,7 +52,7 @@
 
 
         <ImageView
-            android:id="@+id/role"
+            android:id="@+id/player_role"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/werewolf_icon"

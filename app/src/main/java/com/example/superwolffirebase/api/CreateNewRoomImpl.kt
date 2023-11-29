@@ -9,7 +9,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class CreateNewRoomImpl  @Inject constructor(
+class CreateNewRoomImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase
 ) : CreateNewRoom {
 
@@ -17,12 +17,12 @@ class CreateNewRoomImpl  @Inject constructor(
     override suspend fun createNewRoom(name: String): Resource<DatabaseReference> {
         return suspendCoroutine { continuation ->
             val reference = firebaseDatabase.reference.child("rooms")
-            val room = Room(name, 0, 0, 0, false)
+            val room = Room(name, 0, 0, 0, gameStarted = false, isDay = true, gameEnded = false, 0)
             reference.child(name).setValue(room)
                 .addOnCompleteListener {
                     continuation.resume(Resource.Success(firebaseDatabase.reference))
                 }
-                .addOnFailureListener { exception->
+                .addOnFailureListener { exception ->
                     continuation.resume(Resource.Error(exception))
                 }
         }

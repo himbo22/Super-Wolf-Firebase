@@ -9,10 +9,12 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.DebuggingActivityLifecycleCallback.Companion.DEBUG_FRAGMENT
 import dagger.hilt.android.HiltAndroidApp
 
 
+@GlideModule
 @HiltAndroidApp
 class MyApp : Application() {
 

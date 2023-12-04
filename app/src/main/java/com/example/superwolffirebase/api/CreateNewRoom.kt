@@ -5,6 +5,6 @@ import com.google.firebase.database.DatabaseReference
 
 interface CreateNewRoom {
 
-    suspend fun createNewRoom(name: String) : Resource<DatabaseReference>
+    suspend fun createNewRoom(name: String, playerId: String) : Resource<DatabaseReference>
 
 }

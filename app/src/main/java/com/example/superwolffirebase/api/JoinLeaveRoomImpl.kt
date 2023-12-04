@@ -36,67 +36,26 @@ class JoinLeaveRoomImpl @Inject constructor(
         return suspendCoroutine { continuation ->
             val reference = firebaseDatabase.getReference("rooms/${roomName}")
 
-//            reference.addValueEventListener(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val currentPlayers = snapshot.child("players").childrenCount.toInt()
-//                    reference.child("amount").setValue(currentPlayers).addOnSuccessListener {
-//                        val player = PlayerInGame(
-//                            id,
-//                            avatar,
-//                            playerName,
-//                            "",
-//                            false,
-//                            "",
-//                            "",
-//                            0,
-//                            expose = false,
-//                            ready = false
-//                        )
-//                        reference.child("players/${id}").setValue(player).addOnSuccessListener {
-//                            continuation.resume(Event(Resource.Success(player)))
-//                        }
-//                    }
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    continuation.resume(Event(Resource.Error(error.toException())))
-//
-//                }
-//
-//            })
-
-
             reference.runTransaction(object : Transaction.Handler {
                 override fun doTransaction(currentData: MutableData): Transaction.Result {
                     val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
 
                     currentData.child("amount").value = currentAmount + 1
                     val player = PlayerInGame(
-                        id,
-                        avatar,
-                        playerName,
-                        "",
-                        false,
-                        "",
-                        "",
-                        0,
+                        id = id,
+                        avatar = avatar,
+                        name = playerName,
+                        role = "",
+                        dead = false,
+                        voteAvatar = "",
+                        voteId = "",
+                        voted = 0,
                         expose = false,
-                        ready = false
+                        ready = false,
+                        protected = false,
+                        savedByWitch = false
                     )
                     reference.child("players/${id}").setValue(player)
-
-//                    firebaseDatabase.getReference("rooms/${roomName}/players")
-//                        .addValueEventListener(object : ValueEventListener {
-//                            override fun onDataChange(snapshot: DataSnapshot) {
-//                                showLog(snapshot.childrenCount.toString())
-//                                currentData.child("amount").value = snapshot.childrenCount
-//                            }
-//
-//                            override fun onCancelled(error: DatabaseError) {
-//                                TODO("Not yet implemented")
-//                            }
-//
-//                        })
                     continuation.resume(Event(Resource.Success(player)))
                     return Transaction.success(currentData)
                 }
@@ -117,17 +76,34 @@ class JoinLeaveRoomImpl @Inject constructor(
         }
     }
 
+
     override suspend fun leaveRoom(
         roomName: String,
-        amount: Int,
         id: String,
     ): Event<Resource<DatabaseReference>> {
         return suspendCoroutine { continuation ->
             val reference = firebaseDatabase.getReference("rooms").child(roomName)
             reference.runTransaction(object : Transaction.Handler {
                 override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
-                    currentData.child("amount").value = currentAmount - 1
+                    val started = currentData.child("gameStarted").getValue<Boolean>() ?: false
+                    if (started){ // game has been started
+                        currentData.child("dead").value = true
+                        continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
+                    } else { // game is not started
+                        val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
+                        currentData.child("amount").value = currentAmount - 1
+
+                        if (currentData.child("amount").getValue(Int::class.java) == 0) {
+                            reference.removeValue().addOnSuccessListener {
+                                continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
+                            }
+                        } else {
+                            reference.child("players/${id}").removeValue().addOnSuccessListener {
+                                continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
+                            }
+                        }
+                    }
+
 
                     return Transaction.success(currentData)
                 }
@@ -137,18 +113,8 @@ class JoinLeaveRoomImpl @Inject constructor(
                     committed: Boolean,
                     currentData: DataSnapshot?
                 ) {
-                    if (currentData?.child("amount")?.getValue(Int::class.java) == 0) {
-                        reference.removeValue().addOnSuccessListener {
-                            continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
-                        }.addOnFailureListener {
-                            continuation.resume(Event(Resource.Error(it)))
-                        }
-                    } else {
-                        reference.child("players/${id}").removeValue().addOnSuccessListener {
-                            continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
-                        }.addOnFailureListener {
-                            continuation.resume(Event(Resource.Error(it)))
-                        }
+                    if (error != null || !committed) {
+                        continuation.resume(Event(Resource.Error(error!!.toException())))
                     }
                 }
 
@@ -157,6 +123,7 @@ class JoinLeaveRoomImpl @Inject constructor(
         }
 
     }
+
 
 
 }

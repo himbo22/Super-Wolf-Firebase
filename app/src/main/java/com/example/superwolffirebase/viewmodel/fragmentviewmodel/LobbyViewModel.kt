@@ -39,27 +39,29 @@ class LobbyViewModel @Inject constructor(
     val joinRoomResult get() = _joinRoomResult
 
 
-    fun joinRoom(roomName: String,
-                 amount: Int,
-                 id: String,
-                 avatar: String,
-                 playerName : String,
-                 role: String) = viewModelScope.launch {
-        val result = joinRoom.joinRoom(roomName, amount,id, avatar, playerName, role)
+    fun joinRoom(
+        roomName: String,
+        amount: Int,
+        id: String,
+        avatar: String,
+        playerName: String,
+        role: String
+    ) = viewModelScope.launch {
+        val result = joinRoom.joinRoom(roomName, amount, id, avatar, playerName, role)
         _joinRoomResult.postValue(result)
     }
 
 
     init {
 
-        firebaseDatabase.getReference("rooms").addValueEventListener(object : ValueEventListener{
+        firebaseDatabase.getReference("rooms").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val roomListTemp = arrayListOf<Room>()
-                if (snapshot.exists()){
-                    for (roomSnap in snapshot.children){
-                        
+                if (snapshot.exists()) {
+                    for (roomSnap in snapshot.children) {
+
                         val room = roomSnap.getValue(Room::class.java)
-                        if (room != null){
+                        if (room != null) {
                             roomListTemp.add(room)
                         }
                     }
@@ -80,12 +82,11 @@ class LobbyViewModel @Inject constructor(
     }
 
 
-    fun createNewRoom(name: String) = viewModelScope.launch{
+    fun createNewRoom(name: String, playerId: String) = viewModelScope.launch {
         _newRoom.postValue(Resource.Loading)
-        val response = repository.createNewRoom(name)
+        val response = repository.createNewRoom(name, playerId)
         _newRoom.postValue(response)
     }
-
 
 
 }

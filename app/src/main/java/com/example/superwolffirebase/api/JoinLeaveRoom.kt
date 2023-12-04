@@ -18,7 +18,8 @@ interface JoinLeaveRoom {
 
     suspend fun leaveRoom(
         roomName: String,
-        amount: Int,
         id: String,
     ): Event<Resource<DatabaseReference>>
+
+
 }

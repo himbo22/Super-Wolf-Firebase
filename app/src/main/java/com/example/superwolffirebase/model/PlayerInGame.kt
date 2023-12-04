@@ -1,7 +1,7 @@
 package com.example.superwolffirebase.model
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PlayerInGame(
@@ -15,4 +15,7 @@ data class PlayerInGame(
     var voted: Int? = null,
     var expose: Boolean? = null,
     var ready: Boolean? = null,
+    var protected: Boolean? = null,
+    var savedByWitch: Boolean? = null,
+    var killByWitch: Boolean?=null
 ) : Parcelable

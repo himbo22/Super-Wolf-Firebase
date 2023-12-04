@@ -20,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var intentToMainScreenActivity: Intent
     private val viewModel by viewModels<LoginViewModel>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)

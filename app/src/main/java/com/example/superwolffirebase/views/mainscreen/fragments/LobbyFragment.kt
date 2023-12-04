@@ -55,7 +55,7 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 return@setOnClickListener
             } else {
                 val name = binding.etRoomName.text.toString()
-                viewModel.createNewRoom(name)
+                viewModel.createNewRoom(name, args.player.id!!)
                 binding.etRoomName.text = null
             }
         }

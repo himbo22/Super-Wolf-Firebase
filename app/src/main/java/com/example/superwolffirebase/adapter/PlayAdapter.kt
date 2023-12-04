@@ -21,6 +21,7 @@ import com.example.superwolffirebase.other.Constant.SEER
 import com.example.superwolffirebase.other.Constant.VILLAGER
 import com.example.superwolffirebase.other.Constant.WEREWOLF
 import com.example.superwolffirebase.other.Constant.WITCH
+import com.example.superwolffirebase.other.OnItemClick
 import com.example.superwolffirebase.other.OneRoomDiffUtil
 import com.example.superwolffirebase.other.PlayDiffUtil
 import com.example.superwolffirebase.utils.invisible
@@ -83,77 +84,170 @@ class PlayAdapter(
                             "" -> {
                                 listener.vote(currentPlayer)
                             }
+
                             currentPlayer.id -> {
                                 listener.unVote(currentPlayer)
                             }
+
                             else -> {
                                 listener.changeVote(currentPlayer)
                             }
                         }
                     }
                 } else { // night
-                    when (me.role) {
-                        SEER -> {
+                    if (room.witchPhase == true) {
+                        if (me.role == WITCH) {
+                            listener.witchPhase()
+                            if (room.harmPower == true && me != currentPlayer) {
+                                playerView.setOnClickListener {
+                                    when (me.voteId) {
+                                        "" -> listener.witchPick(currentPlayer)
+                                        currentPlayer.id -> listener.witchUnPick(currentPlayer)
+                                        else -> listener.witchChangePick(currentPlayer)
+                                    }
+                                }
+                            }
+                        } else if (me.role == GUARD) {
+                            playerView.setOnClickListener {  }
 
+                        } else if (me.role == WEREWOLF) {
+                            playerView.setOnClickListener {  }
                         }
 
-                        GUARD -> {
+                    } else {
+                        if (me.role == SEER) { // can not expose itself role
+                            if (currentPlayer != me) {
+                                playerView.setOnClickListener {
+                                    listener.seerPick(currentPlayer)
+                                }
+                            }
+                        } else if (me.role == WEREWOLF) { // can not vote alies
+                            if (currentPlayer.role != WEREWOLF && currentPlayer != me) {
+                                playerView.setOnClickListener {
+                                    when (me.voteId) {
+                                        "" -> {
+                                            listener.werewolfVote(currentPlayer)
+                                        }
 
+                                        currentPlayer.id -> {
+                                            listener.werewolfUnVote(currentPlayer)
+                                        }
+
+                                        else -> {
+                                            listener.werewolfChangeVote(currentPlayer)
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (me.role == GUARD) {
+                            playerView.setOnClickListener {
+                                when (me.voteId) {
+                                    "" -> listener.guardVote(currentPlayer)
+                                    currentPlayer.id -> listener.guardUnVote(currentPlayer)
+                                    else -> listener.guardChangeVote(currentPlayer)
+                                }
+                            }
+                        } else if (me.role == VILLAGER) {
+                            playerView.setOnClickListener {
+
+                            }
+                        }
+                    }
+
+
+                }
+
+
+                // show vote
+                if (room.isDay == true) { // day
+                    if (currentPlayer.voted != 0) {
+                        constraintVoted.show()
+                        tvVoted.text = currentPlayer.voted.toString()
+                    } else {
+                        constraintVoted.invisible()
+                    }
+
+                    if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
+                        constraintVote.show()
+                        Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
+                            .into(avatarVote)
+                    } else {
+                        constraintVote.invisible()
+                    }
+                } else { // night
+                    if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) { // if werewolf
+                        if (currentPlayer.voted != 0) {
+                            constraintVoted.show()
+                            tvVoted.text = currentPlayer.voted.toString()
+                        } else {
+                            constraintVoted.invisible()
                         }
 
-                        WITCH -> {
+                        if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
+                            constraintVote.show()
+                            Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
+                                .into(avatarVote)
+                        } else {
+                            constraintVote.invisible()
+                        }
+                    }
 
+                    if (me == currentPlayer) {
+                        if (currentPlayer.voted != 0) {
+                            constraintVoted.show()
+                            tvVoted.text = currentPlayer.voted.toString()
+                        } else {
+                            constraintVoted.invisible()
                         }
 
-                        WEREWOLF -> {
-
+                        if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
+                            constraintVote.show()
+                            Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
+                                .into(avatarVote)
+                        } else {
+                            constraintVote.invisible()
                         }
-
                     }
                 }
 
 
-                if (currentPlayer.voted != 0) {
-                    constraintVoted.show()
-                    tvVoted.text = currentPlayer.voted.toString()
-                } else {
-                    constraintVoted.invisible()
-                }
-
-                if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
-                    constraintVote.show()
-                    Glide.with(avatarVote.context).load(currentPlayer.voteAvatar).into(avatarVote)
-                } else {
-                    constraintVote.invisible()
-                }
 
 
                 if (currentPlayer.dead == true) {
+                    playAvatar.setImageResource(R.drawable.rip)
                     playerView.isClickable = false
                     playerView.isFocusable = false
-                    playAvatar.setImageResource(R.drawable.rip)
                 } else {
+                    playerView.isClickable = true
                     Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
                 }
 
 
                 if (room.gameStarted == true) {
-                    playerView.isClickable = true
+                    if (currentPlayer.dead == true) {
+                        playAvatar.setImageResource(R.drawable.rip)
+                        playerView.isClickable = false
+                        playerView.isFocusable = false
+                    } else {
+                        playerView.isClickable = true
+                        Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
+                    }
+
                     ready.invisible()
                 } else {
                     playerView.isClickable = false
+                    Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
+
                     if (currentPlayer.ready == true) {
                         ready.show()
                     } else {
+
                         ready.invisible()
                     }
                 }
 
 
-
-
-
-
+                // show role
                 if (currentPlayer == me) {
                     when (currentPlayer.role) {
                         SEER -> {
@@ -187,7 +281,6 @@ class PlayAdapter(
                     }
                 } else {
                     if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) {
-                        showLog("1")
                         playerRole.show()
                         playerRole.setImageResource(R.drawable.werewolf_icon)
                     } else {
@@ -226,9 +319,5 @@ class PlayAdapter(
 
 }
 
-interface OnItemClick {
-    fun vote(currentPlayer: PlayerInGame)
-    fun unVote(currentPlayer: PlayerInGame)
-    fun changeVote(currentPlayer: PlayerInGame)
-}
+
 

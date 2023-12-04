@@ -41,4 +41,5 @@
     <string name="type_your_message">Type your message</string>
     <string name="days">DAYS:</string>
     <string name="night">NIGHT:</string>
+    <string name="you_have_no_more_heal_potion">You have no more Heal Potion</string>
 </resources>

@@ -10,13 +10,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.adapter.OnItemClickListener
 import com.example.superwolffirebase.adapter.RoomAdapter
 import com.example.superwolffirebase.databinding.FragmentLobbyBinding
-import com.example.superwolffirebase.model.Player
 import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Resource
+import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.viewmodel.fragmentviewmodel.LobbyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,6 +40,8 @@ class LobbyFragment : Fragment(), OnItemClickListener {
         setUpRoomAdapter()
         setUpObserveViewModel()
 
+        viewModel.getAllRooms()
+
         return binding.root
     }
 
@@ -55,35 +56,56 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 return@setOnClickListener
             } else {
                 val name = binding.etRoomName.text.toString()
-                viewModel.createNewRoom(name, args.player.id!!)
-                binding.etRoomName.text = null
+                viewModel.createNewRoom(name, args.player.id!!, args.player.avatar!!, args.player.name!!)
+                binding.etRoomName.setText("")
+
             }
         }
     }
 
     private fun setUpRoomAdapter() {
-        adapter = RoomAdapter(args.player, this)
+        adapter = RoomAdapter(this)
         binding.roomList.layoutManager = LinearLayoutManager(requireContext())
         binding.roomList.adapter = adapter
     }
 
     private fun setUpObserveViewModel() {
 
-        viewModel.newRoom.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> {
 
+
+        viewModel.newRoom.observe(viewLifecycleOwner) { event ->
+            if (event.hasBeenHandled.not()) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+
+                        }
+
+                        is Resource.Success -> {
+
+                            resource.result.let {
+
+                                val action =
+                                    LobbyFragmentDirections.actionPlayFragmentToPlayFragment(
+                                        it.first,
+                                        args.player,
+                                        it.second
+                                    )
+                                findNavController().navigate(action)
+
+
+                            }
+
+
+                        }
+
+                        is Resource.Error -> {
+
+                        }
+
+                        else -> {}
+                    }
                 }
-
-                is Resource.Success -> {
-
-                }
-
-                is Resource.Error -> {
-
-                }
-
-                else -> {}
             }
         }
 
@@ -102,7 +124,6 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                     resource.exception.let {
                         Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     }
-                    adapter.setData(emptyList())
 
                 }
 
@@ -115,23 +136,31 @@ class LobbyFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(room: Room) {
         val player = args.player
+
         viewModel.joinRoom(
             room.name!!,
-            room.amount!!,
             player.id!!,
             player.avatar!!,
             player.name!!,
-            ""
         )
-        viewModel.joinRoomResult.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let {resource ->
-                    when(resource){
+
+
+        viewModel.joinRoomResult.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
+                    when (resource) {
                         is Resource.Success -> {
-                            resource.result.let{
-                                val action = LobbyFragmentDirections.actionPlayFragmentToPlayFragment(room,args.player, it)
+                            resource.result.let {
+                                val action =
+                                    LobbyFragmentDirections.actionPlayFragmentToPlayFragment(
+                                        room,
+                                        args.player,
+                                        it
+                                    )
                                 findNavController().navigate(action)
                             }
+
+
                         }
 
                         else -> {}
@@ -139,6 +168,7 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 }
             }
         }
+
     }
 
 

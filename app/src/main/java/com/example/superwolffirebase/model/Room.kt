@@ -11,7 +11,7 @@ data class Room(
     var days: Int? = null,
     var nights: Int? = null,
     var gameStarted: Boolean? = null,
-    var isDay: Boolean? = null,
+    var day: Boolean? = null,
     var gameEnded: Boolean? = null,
     var remaining: Int? = null,
     var playerCreateRoomId: String? = null,

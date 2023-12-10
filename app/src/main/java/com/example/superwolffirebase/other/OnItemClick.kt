@@ -21,7 +21,6 @@ interface OnItemClick {
 
     fun guardChangeVote(currentPlayer: PlayerInGame)
 
-    fun witchPhase()
 
     fun witchPick(currentPlayer: PlayerInGame)
 

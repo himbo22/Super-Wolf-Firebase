@@ -35,14 +35,16 @@ import kotlin.math.log
 class PlayAdapter(
     private val id: String,
     private val listener: OnItemClick,
-
     ) :
     RecyclerView.Adapter<PlayAdapter.PlayViewHolder>() {
 
     private var oldPlayerList = emptyList<PlayerInGame>()
-    private var room = Room()
     private var me = PlayerInGame()
-
+    private var isDay = false
+    private var gameStarted: Boolean? = false
+    private var witchPhase: Boolean? = false
+    private var harmPower: Boolean? = false
+    private var gameEnded: Boolean? = false
 
     inner class PlayViewHolder(val binding: ItemPlayerBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -74,11 +76,13 @@ class PlayAdapter(
 
 
 
-                if (room.gameEnded == true) {
+                if (gameEnded == true) {
                     playerRole.show()
                 }
 
-                if (room.isDay == true) { // day
+
+                // vote
+                if (isDay) { // day
                     playerView.setOnClickListener {
                         when (me.voteId) {
                             "" -> {
@@ -95,10 +99,15 @@ class PlayAdapter(
                         }
                     }
                 } else { // night
-                    if (room.witchPhase == true) {
+                    if (me.role == VILLAGER) {
+                        playerView.setOnClickListener {
+
+                        }
+                    }
+
+                    if (witchPhase == true) { // start witch phase
                         if (me.role == WITCH) {
-                            listener.witchPhase()
-                            if (room.harmPower == true && me != currentPlayer) {
+                            if (harmPower == true && currentPlayer != me) {
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
                                         "" -> listener.witchPick(currentPlayer)
@@ -106,15 +115,20 @@ class PlayAdapter(
                                         else -> listener.witchChangePick(currentPlayer)
                                     }
                                 }
+                            } else {
+                                playerView.setOnClickListener {
+
+                                }
                             }
                         } else if (me.role == GUARD) {
-                            playerView.setOnClickListener {  }
-
+                            playerView.setOnClickListener { }
                         } else if (me.role == WEREWOLF) {
-                            playerView.setOnClickListener {  }
+                            playerView.setOnClickListener { }
+                        } else if (me.role == SEER) {
+                            playerView.setOnClickListener { }
                         }
 
-                    } else {
+                    } else { //
                         if (me.role == SEER) { // can not expose itself role
                             if (currentPlayer != me) {
                                 playerView.setOnClickListener {
@@ -122,20 +136,12 @@ class PlayAdapter(
                                 }
                             }
                         } else if (me.role == WEREWOLF) { // can not vote alies
-                            if (currentPlayer.role != WEREWOLF && currentPlayer != me) {
+                            if (currentPlayer.role != WEREWOLF && currentPlayer != me && !isDay) {
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
-                                        "" -> {
-                                            listener.werewolfVote(currentPlayer)
-                                        }
-
-                                        currentPlayer.id -> {
-                                            listener.werewolfUnVote(currentPlayer)
-                                        }
-
-                                        else -> {
-                                            listener.werewolfChangeVote(currentPlayer)
-                                        }
+                                        "" -> listener.werewolfVote(currentPlayer)
+                                        currentPlayer.id -> listener.werewolfUnVote(currentPlayer)
+                                        else -> listener.werewolfChangeVote(currentPlayer)
                                     }
                                 }
                             }
@@ -147,10 +153,8 @@ class PlayAdapter(
                                     else -> listener.guardChangeVote(currentPlayer)
                                 }
                             }
-                        } else if (me.role == VILLAGER) {
-                            playerView.setOnClickListener {
-
-                            }
+                        } else if (me.role == WITCH) {
+                            playerView.setOnClickListener { }
                         }
                     }
 
@@ -159,7 +163,10 @@ class PlayAdapter(
 
 
                 // show vote
-                if (room.isDay == true) { // day
+                if (isDay) { // day
+                    toxicPotion.invisible()
+                    cover.invisible()
+
                     if (currentPlayer.voted != 0) {
                         constraintVoted.show()
                         tvVoted.text = currentPlayer.voted.toString()
@@ -190,24 +197,22 @@ class PlayAdapter(
                         } else {
                             constraintVote.invisible()
                         }
-                    }
-
-                    if (me == currentPlayer) {
-                        if (currentPlayer.voted != 0) {
-                            constraintVoted.show()
-                            tvVoted.text = currentPlayer.voted.toString()
+                    } else if (me.role == WITCH){
+                        if (me.voteId == currentPlayer.id){
+                            toxicPotion.show()
                         } else {
-                            constraintVoted.invisible()
+                            toxicPotion.invisible()
                         }
-
-                        if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
-                            constraintVote.show()
-                            Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
-                                .into(avatarVote)
+                    } else if (me.role == GUARD){
+                        if (me.voteId == currentPlayer.id){
+                            cover.show()
                         } else {
-                            constraintVote.invisible()
+                            cover.invisible()
                         }
                     }
+
+
+
                 }
 
 
@@ -216,18 +221,16 @@ class PlayAdapter(
                 if (currentPlayer.dead == true) {
                     playAvatar.setImageResource(R.drawable.rip)
                     playerView.isClickable = false
-                    playerView.isFocusable = false
                 } else {
                     playerView.isClickable = true
                     Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
                 }
 
 
-                if (room.gameStarted == true) {
+                if (gameStarted == true) {
                     if (currentPlayer.dead == true) {
                         playAvatar.setImageResource(R.drawable.rip)
                         playerView.isClickable = false
-                        playerView.isFocusable = false
                     } else {
                         playerView.isClickable = true
                         Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
@@ -286,7 +289,6 @@ class PlayAdapter(
                     } else {
                         playerRole.invisible()
                     }
-
                 }
 
 
@@ -297,12 +299,42 @@ class PlayAdapter(
     }
 
 
-    fun setRoom(newRoom: Room) {
-        val diffUtil = OneRoomDiffUtil(room, newRoom)
-        val diffResult = DiffUtil.calculateDiff(diffUtil)
-        room = newRoom
-        diffResult.dispatchUpdatesTo(this)
+
+
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setIsDay(newStatus: Boolean) = apply{
+        isDay = newStatus
+        notifyDataSetChanged()
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setGameStarted(newStatus: Boolean){
+        gameStarted = newStatus
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setWitchPhase(newStatus: Boolean){
+        witchPhase = newStatus
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setHarmPower(newStatus: Boolean){
+        harmPower = newStatus
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setGameEnded(newStatus: Boolean){
+        gameEnded = newStatus
+        notifyDataSetChanged()
+    }
+
+
+
 
     fun setData(newPlayerList: List<PlayerInGame>) {
 

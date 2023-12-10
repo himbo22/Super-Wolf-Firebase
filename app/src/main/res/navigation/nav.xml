@@ -11,21 +11,32 @@
         android:label="fragment_main_screen"
         tools:layout="@layout/fragment_main_screen">
         <action
+            app:popUpToSaveState="true"
             android:id="@+id/action_mainScreenFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_mainScreenFragment_to_friendsFragment"
             app:destination="@id/friendsFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_mainScreenFragment_to_aboutFragment"
             app:destination="@id/aboutFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_mainScreenFragment_to_playFragment"
             app:destination="@id/lobbyFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_mainScreenFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_mainScreenFragment_to_lobbyFragment"
             app:destination="@id/lobbyFragment" />
     </fragment>
@@ -56,6 +67,8 @@
             android:id="@+id/action_playFragment_to_mainScreenFragment"
             app:destination="@id/mainScreenFragment" />
         <action
+            app:popUpToSaveState="true"
+
             android:id="@+id/action_playFragment_to_playFragment"
             app:destination="@id/playFragment" />
         <argument

@@ -94,7 +94,7 @@ class SetUpProfileActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     binding.rlLoading.invisible()
                     startActivity(intentToMainScreenActivity)
-                    finish()
+
                 }
 
 

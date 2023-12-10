@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.adapter.MessageAdapter
@@ -28,6 +29,7 @@ import com.example.superwolffirebase.other.Constant.WEREWOLF
 import com.example.superwolffirebase.other.Constant.WITCH
 import com.example.superwolffirebase.other.OnItemClick
 import com.example.superwolffirebase.other.Resource
+import com.example.superwolffirebase.utils.hide
 import com.example.superwolffirebase.utils.hideKeyboard
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
@@ -48,6 +50,7 @@ class PlayFragment : Fragment(), OnItemClick {
     private val viewModel by viewModels<PlayViewModel>()
     private lateinit var playAdapter: PlayAdapter
     private lateinit var messageAdapter: MessageAdapter
+    private var isClick = false
 
 
     override fun onCreateView(
@@ -73,6 +76,16 @@ class PlayFragment : Fragment(), OnItemClick {
     }
 
     private fun setUpView() {
+
+        binding.healPotion.setOnClickListener {
+            isClick = if (isClick) {
+                viewModel.witchSave(args.room.name!!, true)
+                true
+            } else {
+                viewModel.witchSave(args.room.name!!, false)
+                false
+            }
+        }
 
         binding.ready.setOnClickListener {
             viewModel.ready(args.room.name!!, args.player.id!!)
@@ -107,20 +120,93 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.startGame(args.room.name!!, args.player.id!!)
         viewModel.autoPickRole(args.room.name!!, args.player.id!!)
         viewModel.playerCreateRoom(args.room.name!!, args.room.playerCreateRoomId!!)
+        viewModel.getHealPower(args.room.name!!)
+        viewModel.getRoomHarmPower(args.room.name!!)
+        viewModel.getRoomGameStarted(args.room.name!!)
+        viewModel.getRoomWitchPhase(args.room.name!!)
+        viewModel.getRoomGameEnded(args.room.name!!)
+        viewModel.getRoomIsDayStatus(args.room.name!!)
 
 
+        viewModel.seerPick.observe(viewLifecycleOwner){resource->
+            when(resource){
+                is Resource.Success -> {
+                    resource.result.let {
+                        binding.notifyPlayerSeerPicked.show()
+                        binding.tvPlayerSeerPicked.text = it.name
+                        Glide.with(binding.imgPlayerSeerPicked.context).load(it.avatar)
+                            .into(binding.imgPlayerSeerPicked)
+                        when (it.role) {
+                            WEREWOLF -> {
+                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.werewolf_icon)
+                            }
+                            VILLAGER -> {
+                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.villager)
+                            }
+                            WITCH -> {
+                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.witch)
+                            }
+                            else -> {
+                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.shield)
+                            }
+                        }
+                    }
 
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.roomIsDayStatus.observe(viewLifecycleOwner){event->
+            if (!event.hasBeenHandled){
+                event.getContentIfNotHandled()?.let { resource->
+                    when (resource) {
+                        is Resource.Success -> {
+                            resource.result.let {
+                                playAdapter.setIsDay(it)
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            showLog(resource.exception.message.toString())
+                        }
+
+                        else -> {}
+                    } }
+            }
+        }
+        viewModel.witchSaveStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    if (resource.result) {
+                        binding.playerBeingTargeted.setTextColor(R.color.green)
+                    } else {
+                        binding.playerBeingTargeted.setTextColor(R.color.red)
+                    }
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
 
         viewModel.playerBeingTargeted.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     resource.result.let { player ->
+                        binding.notification.show()
                         if (player == PlayerInGame()) { // no one being targeted
-                            binding.notification.show()
                             binding.playerBeingTargeted.text = "${player.name} being targeted"
+                            binding.playerBeingTargeted.show()
+                            binding.healPotion.show()
                         } else {
-                            binding.notification.show()
                             binding.playerBeingTargeted.text = "No one being targeted"
+                            binding.playerBeingTargeted.show()
+                            binding.healPotion.hide()
                         }
                     }
                 }
@@ -153,31 +239,69 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.harmPowerStatus.observe(viewLifecycleOwner) { resource ->
+        viewModel.witchPhaseStatus.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-
+                    playAdapter.setWitchPhase(resource.result)
                 }
 
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
 
                 else -> {}
             }
         }
 
-//        viewModel.startGame.observe(viewLifecycleOwner){resource->
-//            when(resource){
-//                is Resource.Success -> {
-//                    viewModel.startNewDay(args.room.name!!)
-//                }
-//
-//                else -> {}
-//            }
-//        }
+        viewModel.gameEndedStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    playAdapter.setGameEnded(resource.result)
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.gameStartedStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    playAdapter.setGameStarted(resource.result)
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.harmPowerStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    playAdapter.setHarmPower(resource.result)
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
+
+
 
         viewModel.startNewDay.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     Toast.makeText(requireContext(), resource.result, Toast.LENGTH_SHORT).show()
+                    binding.notifyPlayerSeerPicked.invisible()
 //                    binding.days.setTextColor(R.color.black)
 //                    binding.nights.setTextColor(R.color.black)
 //                    binding.timer.setTextColor(R.color.black)
@@ -254,14 +378,13 @@ class PlayFragment : Fragment(), OnItemClick {
                 event.getContentIfNotHandled()?.let { resource ->
                     when (resource) {
                         is Resource.Success -> {
-                            playAdapter.setRoom(resource.result)
                             binding.ready.isClickable = resource.result.gameStarted != true
                             binding.days.text = resource.result.days.toString()
                             binding.nights.text = resource.result.nights.toString()
                         }
 
                         is Resource.Error -> {
-
+                            showLog(resource.exception.message.toString())
                         }
 
                         else -> {}
@@ -359,6 +482,8 @@ class PlayFragment : Fragment(), OnItemClick {
                 event.getContentIfNotHandled()?.let { resource ->
                     when (resource) {
 
+
+
                         is Resource.Success -> {
                             val action =
                                 PlayFragmentDirections.actionPlayFragmentToLobbyFragment(args.player)
@@ -406,7 +531,7 @@ class PlayFragment : Fragment(), OnItemClick {
 
     private fun setUpPlayerList() {
 
-        playAdapter = PlayAdapter(args.playerInGame.id!!, this)
+        playAdapter = PlayAdapter(args.player.id!!, this)
 
         binding.playerList.layoutManager =
             GridLayoutManager(requireContext(), 3, LinearLayoutManager.VERTICAL, false)
@@ -423,13 +548,18 @@ class PlayFragment : Fragment(), OnItemClick {
     // Handle on event click back button in android device
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle the back button press in the fragment
+                    // You can perform custom logic here
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                viewModel.leaveRoom(args.room.name!!, args.player.id!!)
-            }
-
-        })
+                    // Example: navigate back to the previous fragment or activity
+                    requireActivity().supportFragmentManager.popBackStack()
+                    viewModel.leaveRoomWhenClickBackButton(args.room.name!!, args.player.id!!)
+                }
+            })
     }
 
 
@@ -442,7 +572,7 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.votePlayer(
             currentPlayer.avatar!!,
             args.room.name!!,
-            args.playerInGame.id!!,
+            args.player.id!!,
             currentPlayer.id!!
         )
     }
@@ -465,23 +595,32 @@ class PlayFragment : Fragment(), OnItemClick {
     }
 
     override fun seerPick(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.seerPick(currentPlayer)
     }
 
     override fun werewolfVote(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.votePlayer(
+            currentPlayer.avatar!!,
+            args.room.name!!,
+            args.player.id!!,
+            currentPlayer.id!!
+        )
     }
 
     override fun werewolfUnVote(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.unVotePlayer(args.room.name!!, args.player.id!!, currentPlayer.id!!)
     }
 
     override fun werewolfChangeVote(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.changeVotePlayer(
+            args.room.name!!,
+            args.player.id!!,
+            currentPlayer.id!!,
+            currentPlayer.avatar!!
+        )
     }
 
     override fun guardVote(currentPlayer: PlayerInGame) {
-        showLog("hoang cac to")
         viewModel.guardPick(args.room.name!!, currentPlayer, args.player.id!!)
     }
 
@@ -493,23 +632,18 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.guardChangePick(args.room.name!!, args.player.id!!, currentPlayer)
     }
 
-    override fun witchPhase() {
-        viewModel.getHarmPower(args.room.name!!)
-        viewModel.getHealPower(args.room.name!!)
-
-
-    }
 
     override fun witchPick(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.witchKill(args.room.name!!, currentPlayer, args.player.id!!)
     }
 
     override fun witchUnPick(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.witchUnKill(args.room.name!!, currentPlayer, args.player.id!!)
+
     }
 
     override fun witchChangePick(currentPlayer: PlayerInGame) {
-        TODO("Not yet implemented")
+        viewModel.witchChangeKill(args.room.name!!, currentPlayer, args.player.id!!)
     }
 
 

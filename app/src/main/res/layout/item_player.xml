@@ -30,7 +30,6 @@
 
             <TextView
                 android:id="@+id/player_name"
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
@@ -55,6 +54,7 @@
         <ImageView
             android:id="@+id/player_role"
             android:layout_width="30dp"
+            android:visibility="invisible"
             android:layout_height="30dp"
             android:src="@drawable/werewolf_icon"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -65,6 +65,8 @@
             android:id="@+id/constraint_voted"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:visibility="invisible"
+
             android:background="@drawable/circle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -86,6 +88,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_vote"
+            android:visibility="invisible"
             android:layout_width="30dp"
             android:layout_height="30dp"
             app:layout_constraintBottom_toTopOf="@id/constraint_voted"
@@ -116,9 +119,34 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
+            android:id="@+id/toxic_potion"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/toxic_poison"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/cover"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
             android:id="@+id/ready"
             android:layout_width="70dp"
             android:layout_height="70dp"
+            android:visibility="invisible"
             android:src="@drawable/yes"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

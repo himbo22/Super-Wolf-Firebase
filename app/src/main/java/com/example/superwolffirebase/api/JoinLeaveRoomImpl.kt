@@ -3,6 +3,7 @@ package com.example.superwolffirebase.api
 import android.provider.ContactsContract.Data
 import com.example.superwolffirebase.model.Player
 import com.example.superwolffirebase.model.PlayerInGame
+import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
 import com.example.superwolffirebase.utils.await
@@ -15,7 +16,9 @@ import com.google.firebase.database.MutableData
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.lang.Exception
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -27,103 +30,129 @@ class JoinLeaveRoomImpl @Inject constructor(
 
     override suspend fun joinRoom(
         roomName: String,
-        amount: Int,
         id: String,
         avatar: String,
         playerName: String,
-        role: String
-    ): Event<Resource<PlayerInGame>> {
-        return suspendCoroutine { continuation ->
-            val reference = firebaseDatabase.getReference("rooms/${roomName}")
+    ): Event<Resource<PlayerInGame>> = suspendCancellableCoroutine { continuation ->
+        val reference = firebaseDatabase.getReference("rooms/${roomName}")
 
-            reference.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val currentAmount = snapshot.child("amount").getValue<Int>()
+                    if (currentAmount != null) {
 
-                    currentData.child("amount").value = currentAmount + 1
-                    val player = PlayerInGame(
-                        id = id,
-                        avatar = avatar,
-                        name = playerName,
-                        role = "",
-                        dead = false,
-                        voteAvatar = "",
-                        voteId = "",
-                        voted = 0,
-                        expose = false,
-                        ready = false,
-                        protected = false,
-                        savedByWitch = false
-                    )
-                    reference.child("players/${id}").setValue(player)
-                    continuation.resume(Event(Resource.Success(player)))
-                    return Transaction.success(currentData)
-                }
+                        val player = PlayerInGame(
+                            id = id,
+                            avatar = avatar,
+                            name = playerName,
+                            role = "",
+                            dead = false,
+                            voteAvatar = "",
+                            voteId = "",
+                            voted = 0,
+                            expose = false,
+                            ready = false,
+                            protected = false,
+                            savedByWitch = false
+                        )
 
-                override fun onComplete(
-                    error: DatabaseError?,
-                    committed: Boolean,
-                    currentData: DataSnapshot?
-                ) {
-                    if (!committed || error != null) {
-                        continuation.resume(Event(Resource.Error(Exception("Failed to join room"))))
+                        reference.updateChildren(
+                            mapOf(
+                                "amount" to currentAmount + 1,
+                                "players/${id}" to player
+                            )
+                        ).addOnSuccessListener {
+                            continuation.resume(Event(Resource.Success(player)))
+                        }
                     }
                 }
+            }
 
-            })
+            override fun onCancelled(error: DatabaseError) {
+                continuation.resume(Event(Resource.Error(error.toException())))
+            }
+
+        })
 
 
-        }
     }
+
 
 
     override suspend fun leaveRoom(
         roomName: String,
         id: String,
-    ): Event<Resource<DatabaseReference>> {
-        return suspendCoroutine { continuation ->
-            val reference = firebaseDatabase.getReference("rooms").child(roomName)
-            reference.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    val started = currentData.child("gameStarted").getValue<Boolean>() ?: false
-                    if (started){ // game has been started
-                        currentData.child("dead").value = true
-                        continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
-                    } else { // game is not started
-                        val currentAmount = currentData.child("amount").getValue(Int::class.java) ?: 0
-                        currentData.child("amount").value = currentAmount - 1
+    ): Event<Resource<DatabaseReference>> = suspendCancellableCoroutine { continuation ->
+        val reference = firebaseDatabase.getReference("rooms/${roomName}")
 
-                        if (currentData.child("amount").getValue(Int::class.java) == 0) {
-                            reference.removeValue().addOnSuccessListener {
-                                continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
-                            }
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val gameStarted = snapshot.child("gameStarted").getValue<Boolean>()
+                    if (gameStarted != null) {
+                        if (gameStarted == true) {
+                            reference.child("players/${id}/dead").setValue(true)
                         } else {
-                            reference.child("players/${id}").removeValue().addOnSuccessListener {
-                                continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
+                            val currentAmount = snapshot.child("amount").getValue(Int::class.java)
+                            if (currentAmount != null) {
+                                reference.updateChildren(
+                                    mapOf(
+                                        "amount" to currentAmount - 1
+                                    )
+                                )
+                            } else {
+                                showLog("JoinLeaveRoomImpl 102")
                             }
                         }
-                    }
-
-
-                    return Transaction.success(currentData)
-                }
-
-                override fun onComplete(
-                    error: DatabaseError?,
-                    committed: Boolean,
-                    currentData: DataSnapshot?
-                ) {
-                    if (error != null || !committed) {
-                        continuation.resume(Event(Resource.Error(error!!.toException())))
+                        continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
                     }
                 }
+            }
 
-            })
+            override fun onCancelled(error: DatabaseError) {
+                continuation.resume(Event(Resource.Error(error.toException())))
+            }
 
-        }
+        })
 
     }
 
+    override suspend fun leaveRoomWhenClickBackButton(
+        roomName: String,
+        id: String,
+    ): Event<Resource<DatabaseReference>> = suspendCancellableCoroutine { continuation ->
+        val reference = firebaseDatabase.getReference("rooms").child(roomName)
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val gameStarted = snapshot.child("gameStarted").getValue<Boolean>()
+                    if (gameStarted != null) {
+                        if (gameStarted == true) {
+                            reference.child("players/${id}/dead").setValue(true)
+                        } else {
+                            val currentAmount = snapshot.child("amount").getValue(Int::class.java)
+                            if (currentAmount != null) {
+                                reference.updateChildren(
+                                    mapOf(
+                                        "amount" to currentAmount - 1
+                                    )
+                                )
+                            } else {
+                                showLog("JoinLeaveRoomImpl 102")
+                            }
+                        }
+                        continuation.resume(Event(Resource.Success(firebaseDatabase.reference)))
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                continuation.resume(Event(Resource.Error(error.toException())))
+            }
+
+        })
+    }
 
 
 }

@@ -6,21 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.CreateNewRoom
 import com.example.superwolffirebase.api.JoinLeaveRoom
-import com.example.superwolffirebase.model.Player
 import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 
 
 @HiltViewModel
@@ -31,61 +28,68 @@ class LobbyViewModel @Inject constructor(
     private val joinRoom: JoinLeaveRoom
 ) : ViewModel() {
 
-    private val _newRoom = MutableLiveData<Resource<DatabaseReference>>()
-    val newRoom get() = _newRoom
+    private val _newRoom = MutableLiveData<Event<Resource<Pair<Room,PlayerInGame>>>>()
+    val newRoom = _newRoom
     private var _allRoom = MutableLiveData<Resource<List<Room>>>()
     val allRoom get() = _allRoom
     private val _joinRoomResult = MutableLiveData<Event<Resource<PlayerInGame>>>()
-    val joinRoomResult get() = _joinRoomResult
+    val joinRoomResult  = _joinRoomResult
 
 
     fun joinRoom(
         roomName: String,
-        amount: Int,
         id: String,
         avatar: String,
-        playerName: String,
-        role: String
+        playerName: String
     ) = viewModelScope.launch {
-        val result = joinRoom.joinRoom(roomName, amount, id, avatar, playerName, role)
+        val result = joinRoom.joinRoom(roomName, id, avatar, playerName)
         _joinRoomResult.postValue(result)
     }
 
 
-    init {
 
+    fun getAllRooms(){
         firebaseDatabase.getReference("rooms").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val roomListTemp = arrayListOf<Room>()
-                if (snapshot.exists()) {
-                    for (roomSnap in snapshot.children) {
+                try {
+                    if (snapshot.exists()) {
+                        for (roomSnap in snapshot.children) {
 
-                        val room = roomSnap.getValue(Room::class.java)
-                        if (room != null) {
-                            roomListTemp.add(room)
+                            val room = roomSnap.getValue(Room::class.java)
+
+
+
+                            if (room != null) {
+                                roomListTemp.add(room)
+                            }
                         }
+                        _allRoom.postValue(Resource.Success(roomListTemp))
+
+                    } else {
+                        _allRoom.postValue(Resource.Error(Exception("Have no any rooms")))
+
                     }
-                    _allRoom.postValue(Resource.Success(roomListTemp))
 
-                } else {
-                    _allRoom.postValue(Resource.Error(Exception("Have no any rooms")))
-
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+
 
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                _allRoom.postValue(Resource.Error(error.toException()))
             }
 
         })
     }
 
 
-    fun createNewRoom(name: String, playerId: String) = viewModelScope.launch {
-        _newRoom.postValue(Resource.Loading)
-        val response = repository.createNewRoom(name, playerId)
-        _newRoom.postValue(response)
+    fun createNewRoom(name: String, playerId: String, avatar: String, playerName: String) = viewModelScope.launch {
+        _newRoom.postValue(Event(Resource.Loading))
+        val response = repository.createNewRoom(name, playerId, avatar, playerName)
+        _newRoom.postValue((response))
     }
 
 

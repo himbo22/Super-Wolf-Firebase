@@ -35,16 +35,17 @@ import kotlin.math.log
 class PlayAdapter(
     private val id: String,
     private val listener: OnItemClick,
-    ) :
+) :
     RecyclerView.Adapter<PlayAdapter.PlayViewHolder>() {
 
     private var oldPlayerList = emptyList<PlayerInGame>()
     private var me = PlayerInGame()
-    private var isDay = false
+    private var isDay: Boolean? = false
     private var gameStarted: Boolean? = false
     private var witchPhase: Boolean? = false
     private var harmPower: Boolean? = false
     private var gameEnded: Boolean? = false
+    private var seerPicked: Boolean? = false
 
     inner class PlayViewHolder(val binding: ItemPlayerBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -82,32 +83,34 @@ class PlayAdapter(
 
 
                 // vote
-                if (isDay) { // day
-                    playerView.setOnClickListener {
-                        when (me.voteId) {
-                            "" -> {
-                                listener.vote(currentPlayer)
-                            }
-
-                            currentPlayer.id -> {
-                                listener.unVote(currentPlayer)
-                            }
-
-                            else -> {
-                                listener.changeVote(currentPlayer)
-                            }
-                        }
-                    }
-                } else { // night
-                    if (me.role == VILLAGER) {
+                if (isDay == true) { // day
+                    if (!currentPlayer.dead!!) {
+                        playerView.isClickable = true
                         playerView.setOnClickListener {
+                            when (me.voteId) {
+                                "" -> {
+                                    listener.vote(currentPlayer)
+                                }
 
+                                currentPlayer.id -> {
+                                    listener.unVote(currentPlayer)
+                                }
+
+                                else -> {
+                                    listener.changeVote(currentPlayer)
+                                }
+                            }
                         }
                     }
+
+                } else { // night
+
 
                     if (witchPhase == true) { // start witch phase
+
                         if (me.role == WITCH) {
                             if (harmPower == true && currentPlayer != me) {
+                                playerView.isClickable = true
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
                                         "" -> listener.witchPick(currentPlayer)
@@ -116,36 +119,54 @@ class PlayAdapter(
                                     }
                                 }
                             } else {
-                                playerView.setOnClickListener {
-
-                                }
+                                playerView.isClickable = false
                             }
-                        } else if (me.role == GUARD) {
-                            playerView.setOnClickListener { }
-                        } else if (me.role == WEREWOLF) {
-                            playerView.setOnClickListener { }
-                        } else if (me.role == SEER) {
-                            playerView.setOnClickListener { }
+                        } else {
+                            playerView.isClickable = false
                         }
 
-                    } else { //
+                    } else { // not come to witch phase yet
+
                         if (me.role == SEER) { // can not expose itself role
-                            if (currentPlayer != me) {
-                                playerView.setOnClickListener {
-                                    listener.seerPick(currentPlayer)
+
+                            showLog(seerPicked.toString())
+
+
+                            playerView.setOnClickListener {
+                                showLog("cac")
+                                when (seerPicked) {
+                                    false -> {
+                                        listener.seerPick(currentPlayer)
+                                    }
+
+                                    true -> {
+
+                                    }
+
+                                    null -> TODO()
                                 }
                             }
+
+
                         } else if (me.role == WEREWOLF) { // can not vote alies
-                            if (currentPlayer.role != WEREWOLF && currentPlayer != me && !isDay) {
+
+                            if (currentPlayer.role != WEREWOLF && currentPlayer != me) {
+                                playerView.isClickable = true
+
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
                                         "" -> listener.werewolfVote(currentPlayer)
-                                        currentPlayer.id -> listener.werewolfUnVote(currentPlayer)
+                                        currentPlayer.id -> listener.werewolfUnVote(
+                                            currentPlayer
+                                        )
+
                                         else -> listener.werewolfChangeVote(currentPlayer)
                                     }
                                 }
                             }
                         } else if (me.role == GUARD) {
+                            playerView.isClickable = true
+
                             playerView.setOnClickListener {
                                 when (me.voteId) {
                                     "" -> listener.guardVote(currentPlayer)
@@ -154,16 +175,16 @@ class PlayAdapter(
                                 }
                             }
                         } else if (me.role == WITCH) {
-                            playerView.setOnClickListener { }
+                            playerView.isClickable = false
+                        } else {
+                            playerView.isClickable = false
                         }
                     }
-
-
                 }
 
 
                 // show vote
-                if (isDay) { // day
+                if (isDay == true) { // day
                     toxicPotion.invisible()
                     cover.invisible()
 
@@ -182,49 +203,44 @@ class PlayAdapter(
                         constraintVote.invisible()
                     }
                 } else { // night
-                    if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) { // if werewolf
-                        if (currentPlayer.voted != 0) {
-                            constraintVoted.show()
-                            tvVoted.text = currentPlayer.voted.toString()
-                        } else {
-                            constraintVoted.invisible()
+                    if (witchPhase == true) {
+                        if (me.role == WITCH) {
+                            if (me.voteId == currentPlayer.id) {
+                                toxicPotion.show()
+                            } else {
+                                toxicPotion.invisible()
+                            }
                         }
+                    } else {
+                        if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) { // if werewolf
+                            if (currentPlayer.voted != 0) {
+                                constraintVoted.show()
+                                tvVoted.text = currentPlayer.voted.toString()
+                            } else {
+                                constraintVoted.invisible()
+                            }
 
-                        if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
-                            constraintVote.show()
-                            Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
-                                .into(avatarVote)
-                        } else {
-                            constraintVote.invisible()
-                        }
-                    } else if (me.role == WITCH){
-                        if (me.voteId == currentPlayer.id){
-                            toxicPotion.show()
-                        } else {
-                            toxicPotion.invisible()
-                        }
-                    } else if (me.role == GUARD){
-                        if (me.voteId == currentPlayer.id){
-                            cover.show()
-                        } else {
-                            cover.invisible()
+                            if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
+                                constraintVote.show()
+                                Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
+                                    .into(avatarVote)
+                            } else {
+                                constraintVote.invisible()
+                            }
+                        } else if (me.role == GUARD) {
+                            if (me.voteId == currentPlayer.id) {
+                                cover.show()
+                            } else {
+                                cover.invisible()
+                            }
                         }
                     }
 
 
-
                 }
 
 
 
-
-                if (currentPlayer.dead == true) {
-                    playAvatar.setImageResource(R.drawable.rip)
-                    playerView.isClickable = false
-                } else {
-                    playerView.isClickable = true
-                    Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
-                }
 
 
                 if (gameStarted == true) {
@@ -239,12 +255,12 @@ class PlayAdapter(
                     ready.invisible()
                 } else {
                     playerView.isClickable = false
+
                     Glide.with(playAvatar.context).load(currentPlayer.avatar).into(playAvatar)
 
                     if (currentPlayer.ready == true) {
                         ready.show()
                     } else {
-
                         ready.invisible()
                     }
                 }
@@ -298,42 +314,41 @@ class PlayAdapter(
 
     }
 
-
-
-
-
+    @SuppressLint("NotifyDataSetChanged")
+    fun setSeerPicked(newStatus: Boolean) = apply {
+        seerPicked = newStatus
+        notifyDataSetChanged()
+    }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setIsDay(newStatus: Boolean) = apply{
+    fun setIsDay(newStatus: Boolean) = apply {
         isDay = newStatus
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setGameStarted(newStatus: Boolean){
+    fun setGameStarted(newStatus: Boolean) {
         gameStarted = newStatus
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setWitchPhase(newStatus: Boolean){
+    fun setWitchPhase(newStatus: Boolean) {
         witchPhase = newStatus
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setHarmPower(newStatus: Boolean){
+    fun setHarmPower(newStatus: Boolean) {
         harmPower = newStatus
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setGameEnded(newStatus: Boolean){
+    fun setGameEnded(newStatus: Boolean) {
         gameEnded = newStatus
         notifyDataSetChanged()
     }
-
-
 
 
     fun setData(newPlayerList: List<PlayerInGame>) {

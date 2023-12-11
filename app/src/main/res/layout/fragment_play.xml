@@ -182,6 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name"
+            android:textSize="12sp"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -190,8 +191,8 @@
 
         <ImageView
             android:id="@+id/img_player_seer_picked"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/sun"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -199,8 +200,8 @@
 
         <ImageView
             android:id="@+id/img_player_role_seer_picked"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
             android:src="@drawable/werewolf_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -233,6 +234,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
+            android:textSize="12sp"
             android:gravity="center"
             android:text="@string/name"
             android:textColor="@color/red"

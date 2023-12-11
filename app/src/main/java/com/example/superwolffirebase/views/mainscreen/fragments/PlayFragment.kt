@@ -126,32 +126,59 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.getRoomWitchPhase(args.room.name!!)
         viewModel.getRoomGameEnded(args.room.name!!)
         viewModel.getRoomIsDayStatus(args.room.name!!)
+        viewModel.getRoomSeerPicked(args.room.name!!)
 
+
+
+
+        viewModel.roomSeerPickedStatus.observe(viewLifecycleOwner){resource->
+            when(resource){
+                is Resource.Success -> {
+                    resource.result.let {
+                        playAdapter.setSeerPicked(it)
+                    }
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
 
         viewModel.seerPick.observe(viewLifecycleOwner){resource->
             when(resource){
                 is Resource.Success -> {
                     resource.result.let {
-                        binding.notifyPlayerSeerPicked.show()
-                        binding.tvPlayerSeerPicked.text = it.name
-                        Glide.with(binding.imgPlayerSeerPicked.context).load(it.avatar)
-                            .into(binding.imgPlayerSeerPicked)
-                        when (it.role) {
-                            WEREWOLF -> {
-                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.werewolf_icon)
+                        if (it != PlayerInGame()){
+                            binding.notifyPlayerSeerPicked.show()
+                            binding.tvPlayerSeerPicked.text = it.name
+                            Glide.with(binding.imgPlayerSeerPicked.context).load(it.avatar)
+                                .into(binding.imgPlayerSeerPicked)
+                            when (it.role) {
+                                WEREWOLF -> {
+                                    binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.werewolf_icon)
+                                }
+                                VILLAGER -> {
+                                    binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.villager)
+                                }
+                                WITCH -> {
+                                    binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.witch)
+                                }
+                                else -> {
+                                    binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.shield)
+                                }
                             }
-                            VILLAGER -> {
-                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.villager)
-                            }
-                            WITCH -> {
-                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.witch)
-                            }
-                            else -> {
-                                binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.shield)
-                            }
+                        } else {
+                            binding.notifyPlayerSeerPicked.invisible()
                         }
                     }
 
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
                 }
 
                 else -> {}
@@ -197,9 +224,11 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.playerBeingTargeted.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
+
+
                     resource.result.let { player ->
                         binding.notification.show()
-                        if (player == PlayerInGame()) { // no one being targeted
+                        if (player != PlayerInGame()) { // no one being targeted
                             binding.playerBeingTargeted.text = "${player.name} being targeted"
                             binding.playerBeingTargeted.show()
                             binding.healPotion.show()
@@ -224,9 +253,9 @@ class PlayFragment : Fragment(), OnItemClick {
                 is Resource.Success -> {
                     if (resource.result) {
                         binding.healPotion.show()
-                        binding.noMoreHeal.invisible()
+                        binding.noMoreHeal.hide()
                     } else {
-                        binding.healPotion.invisible()
+                        binding.healPotion.hide()
                         binding.noMoreHeal.show()
                     }
                 }
@@ -300,8 +329,6 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.startNewDay.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    Toast.makeText(requireContext(), resource.result, Toast.LENGTH_SHORT).show()
-                    binding.notifyPlayerSeerPicked.invisible()
 //                    binding.days.setTextColor(R.color.black)
 //                    binding.nights.setTextColor(R.color.black)
 //                    binding.timer.setTextColor(R.color.black)
@@ -595,7 +622,7 @@ class PlayFragment : Fragment(), OnItemClick {
     }
 
     override fun seerPick(currentPlayer: PlayerInGame) {
-        viewModel.seerPick(currentPlayer)
+        viewModel.seerPick(currentPlayer, args.room.name!!)
     }
 
     override fun werewolfVote(currentPlayer: PlayerInGame) {

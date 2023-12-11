@@ -38,7 +38,8 @@ class CreateNewRoomImpl @Inject constructor(
                     playerCreateRoomId = playerId,
                     harmPower  = true,
                     healPower = true,
-                    witchPhase = false
+                    witchPhase = false,
+                    seerPicked = false
                 )
 
             val player = PlayerInGame(
@@ -53,7 +54,7 @@ class CreateNewRoomImpl @Inject constructor(
                 expose = false,
                 ready = false,
                 protected = false,
-                savedByWitch = false
+                savedByWitch = false,
             )
 
             firebaseDatabase.getReference("rooms/${name}").setValue(room).addOnSuccessListener {

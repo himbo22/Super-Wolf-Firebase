@@ -17,5 +17,6 @@ data class Room(
     var playerCreateRoomId: String? = null,
     var harmPower: Boolean? = null,
     var healPower: Boolean? = null,
-    var witchPhase: Boolean? = null
+    var witchPhase: Boolean? = null,
+    var seerPicked: Boolean? = null
 ) : Parcelable

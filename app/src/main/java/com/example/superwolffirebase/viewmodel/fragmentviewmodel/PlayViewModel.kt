@@ -87,10 +87,33 @@ class PlayViewModel @Inject constructor(
     val gameEndedStatus get() = _gameEndedStatus
     private val _roomIsDayStatus = MutableLiveData<Event<Resource<Boolean>>>()
     val roomIsDayStatus get() = _roomIsDayStatus
+    private val _roomSeerPickedStatus = MutableLiveData<Resource<Boolean>>()
+    val roomSeerPickedStatus = _roomSeerPickedStatus
+
+    fun seerPick(playerGetExposeRole: PlayerInGame, roomName: String) {
+
+        firebaseDatabase.getReference("rooms/${roomName}/seerPicked").setValue(true).addOnSuccessListener {
+            firebaseDatabase.getReference("rooms/${roomName}/witchPhase").addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        val witchPhase = snapshot.getValue<Boolean>() ?: false
+                        if (witchPhase){
+                            _seerPick.postValue(Resource.Success(PlayerInGame()))
+                            snapshot.ref.removeEventListener(this)
+                        } else {
+                            _seerPick.postValue(Resource.Success(playerGetExposeRole))
+                        }
+                    }
+
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+        }
 
 
-    fun seerPick(playerGetExposeRole: PlayerInGame) {
-        _seerPick.postValue(Resource.Success(playerGetExposeRole))
+
     }
 
     fun witchKill(roomName: String, playerWantKill: PlayerInGame, uid: String) {
@@ -383,25 +406,32 @@ class PlayViewModel @Inject constructor(
     }
 
 
-    fun resetPlayersStatus(roomName: String) {
+    fun resetPlayersStatus(roomName: String, uid: String) {
         firebaseDatabase.getReference("rooms/${roomName}/players")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
-                        snapshot.children.mapNotNull { it.getValue<PlayerInGame>() }
-                            .forEach { player ->
-                                firebaseDatabase.getReference("rooms/${roomName}/players/${player.id}")
-                                    .updateChildren(
-                                        mapOf(
-                                            "voteAvatar" to "",
-                                            "voteId" to "",
-                                            "voted" to 0,
-                                            "protected" to false,
-                                            "saveByWitch" to false,
-                                            "killByWitch" to false
-                                        )
-                                    )
+                        firebaseDatabase.reference.child("rooms/${roomName}/playerCreateRoomId")
+                            .get().addOnSuccessListener { playerCreate ->
+                                val playerCreateRoom = playerCreate.getValue<String>() ?: ""
+                                if (playerCreateRoom == uid) {
+                                    snapshot.children.mapNotNull { it.getValue<PlayerInGame>() }
+                                        .forEach { player ->
+                                            firebaseDatabase.getReference("rooms/${roomName}/players/${player.id}")
+                                                .updateChildren(
+                                                    mapOf(
+                                                        "voteAvatar" to "",
+                                                        "voteId" to "",
+                                                        "voted" to 0,
+                                                        "protected" to false,
+//                                            "saveByWitch" to false,
+//                                            "killByWitch" to false
+                                                    )
+                                                )
+                                        }
+                                }
                             }
+
                     }
                 }
 
@@ -420,25 +450,52 @@ class PlayViewModel @Inject constructor(
     }
 
 
-    fun playerGetKilled(roomName: String) {
+    fun playerGetKilled(roomName: String, uid: String) {
         firebaseDatabase.getReference("rooms/${roomName}/players")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     firebaseDatabase.reference.child("rooms/${roomName}/remaining").get()
                         .addOnSuccessListener { remainingSnapshot ->
-                            val remaining =
-                                remainingSnapshot.getValue<Int>() ?: return@addOnSuccessListener
-                            val voteThreshold =
-                                if (remaining % 3 == 0) remaining / 3 else remaining / 3 + 1
                             if (snapshot.exists()) {
-                                snapshot.children.mapNotNull { it.getValue<PlayerInGame>() }
-                                    .filter { it.voted!! >= voteThreshold }
-                                    .maxByOrNull { it.voted!! }
-                                    ?.takeIf { it.voted!! >= voteThreshold }
-                                    ?.let {
-                                        firebaseDatabase.getReference("rooms/${roomName}/players/${it.id}/dead")
-                                            .setValue(true)
-                                        resetPlayersStatus(roomName)
+                                firebaseDatabase.reference.child("rooms/${roomName}/playerCreateRoomId")
+                                    .get().addOnSuccessListener { playerCreateRoom ->
+                                        val playerCreate = playerCreateRoom.getValue<String>()
+                                            ?: ""
+                                        if (playerCreate == uid) {
+                                            val remaining =
+                                                remainingSnapshot.getValue<Int>() ?: 0
+
+                                            val voteThreshold =
+                                                if (remaining % 3 == 0) remaining / 3 else remaining / 3 + 1
+
+
+
+                                            snapshot.children.mapNotNull { it.getValue<PlayerInGame>() }
+                                                .filter { it.voted!! >= voteThreshold }
+
+                                                .maxByOrNull { it.voted!! }
+                                                ?.takeIf { it.voted!! > voteThreshold }
+                                                ?.let { player ->
+
+                                                    val result = if (snapshot.children.count {
+                                                            it.getValue<PlayerInGame>()?.voted == player.voted
+                                                        } > 1
+                                                    ) {
+                                                        null
+                                                    } else {
+                                                        player
+                                                    }
+
+                                                    if (result != null) {
+                                                        firebaseDatabase.getReference("rooms/${roomName}/players/${result.id}/dead")
+                                                            .setValue(true)
+                                                        resetPlayersStatus(roomName, uid)
+                                                    } else {
+                                                        resetPlayersStatus(roomName, uid)
+                                                    }
+
+                                                }
+                                        }
                                     }
 
                             }
@@ -566,6 +623,7 @@ class PlayViewModel @Inject constructor(
                         reference.removeEventListener(this)
 
                     } else {
+
                     }
                 }
             }
@@ -583,15 +641,17 @@ class PlayViewModel @Inject constructor(
 
 
         timer = object : CountDownTimer(10000L, 1000L) {
+
             override fun onTick(millisUntilFinished: Long) {
                 _timeCountdown.postValue(Resource.Success((millisUntilFinished / 1000).toString()))
+                _startNewDay.postValue(Resource.Success(""))
             }
 
             override fun onFinish() {
+                _startNewDay.postValue(Resource.Error(Exception()))
                 updateRoomDayAndNight(roomName, uid, true)
-                playerGetKilled(roomName)
+                playerGetKilled(roomName, uid)
                 startNewNight(roomName, uid)
-                resetPlayersStatus(roomName)
             }
         }.start()
 
@@ -601,7 +661,12 @@ class PlayViewModel @Inject constructor(
 
     fun startWitchPhase(roomName: String, uid: String) {
 
-        firebaseDatabase.getReference("rooms/${roomName}/witchPhase").setValue(true)
+        firebaseDatabase.getReference("rooms/${roomName}").updateChildren(
+            mapOf(
+                "witchPhase" to true,
+                "seerPicked" to false
+            )
+        )
 
 
         firebaseDatabase.getReference("rooms/${roomName}/players")
@@ -647,18 +712,18 @@ class PlayViewModel @Inject constructor(
                                     if (maxPlayerVoted?.savedByWitch == true) {
                                         firebaseDatabase.getReference("rooms/${roomName}/healPower")
                                             .setValue(false)
-                                        resetPlayersStatus(roomName)
+                                        resetPlayersStatus(roomName, uid)
                                         startNewDay(roomName, uid)
                                         updateRoomDayAndNight(roomName, uid, false)
                                     } else {
                                         if (maxPlayerVoted?.protected == true) {
-                                            resetPlayersStatus(roomName)
+                                            resetPlayersStatus(roomName, uid)
                                             startNewDay(roomName, uid)
                                             updateRoomDayAndNight(roomName, uid, false)
                                         } else {
 //                                            firebaseDatabase.getReference("rooms/${roomName}/players/${maxPlayerVoted?.id}/dead")
 //                                                .setValue(true)
-                                            resetPlayersStatus(roomName)
+                                            resetPlayersStatus(roomName, uid)
                                             startNewDay(roomName, uid)
                                             updateRoomDayAndNight(roomName, uid, false)
                                         }
@@ -683,7 +748,7 @@ class PlayViewModel @Inject constructor(
 
                                         _playerBeingTargeted.postValue(Resource.Error(Exception("")))
                                     }
-                                    resetPlayersStatus(roomName)
+                                    resetPlayersStatus(roomName, uid)
                                     startNewDay(roomName, uid)
                                     updateRoomDayAndNight(roomName, uid, false)
                                 }
@@ -704,6 +769,7 @@ class PlayViewModel @Inject constructor(
     fun startNewNight(roomName: String, uid: String) {
 
 
+
         timer = object : CountDownTimer(15000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
 
@@ -720,11 +786,11 @@ class PlayViewModel @Inject constructor(
 
     fun updateRoomDayAndNight(roomName: String, uid: String, day: Boolean) {
         val reference = firebaseDatabase.getReference("rooms/${roomName}")
-        reference.addListenerForSingleValueEvent(object : ValueEventListener{
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     val playerCreateRoomId = snapshot.child("playerCreateRoomId").getValue<String>()
-                    if (uid == playerCreateRoomId){
+                    if (uid == playerCreateRoomId) {
                         if (day) {
                             val currentDay = snapshot.child("days").getValue<Int>()
                             if (currentDay != null) {
@@ -741,7 +807,8 @@ class PlayViewModel @Inject constructor(
                                 reference.updateChildren(
                                     mapOf(
                                         "nights" to currentNight + 1,
-                                        "day" to true
+                                        "day" to true,
+                                        "witchPhase" to false
                                     )
                                 )
                             }
@@ -963,13 +1030,11 @@ class PlayViewModel @Inject constructor(
     }
 
 
-
-
-    fun getRoomHarmPower(roomName: String){
+    fun getRoomHarmPower(roomName: String) {
         firebaseDatabase.getReference("rooms/${roomName}/harmPower")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         val status = snapshot.getValue<Boolean>() ?: false
                         _harmPowerStatus.postValue(Resource.Success(status))
                     }
@@ -983,11 +1048,11 @@ class PlayViewModel @Inject constructor(
     }
 
 
-    fun getRoomGameEnded(roomName: String){
+    fun getRoomGameEnded(roomName: String) {
         firebaseDatabase.getReference("rooms/${roomName}/gameEnded")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         val status = snapshot.getValue<Boolean>() ?: false
                         _gameEndedStatus.postValue(Resource.Success(status))
                     }
@@ -999,11 +1064,12 @@ class PlayViewModel @Inject constructor(
 
             })
     }
-    fun getRoomWitchPhase(roomName: String){
+
+    fun getRoomWitchPhase(roomName: String) {
         firebaseDatabase.getReference("rooms/${roomName}/witchPhase")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         val status = snapshot.getValue<Boolean>() ?: false
                         _witchPhaseStatus.postValue(Resource.Success(status))
                     }
@@ -1020,7 +1086,7 @@ class PlayViewModel @Inject constructor(
         firebaseDatabase.getReference("rooms/${roomName}/gameStarted")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         val status = snapshot.getValue<Boolean>() ?: false
                         _gameStartedStatus.postValue(Resource.Success(status))
                     }
@@ -1033,11 +1099,28 @@ class PlayViewModel @Inject constructor(
             })
     }
 
-    fun getRoomIsDayStatus(roomName: String){
+
+    fun getRoomSeerPicked(roomName: String){
+        firebaseDatabase.getReference("rooms/${roomName}/seerPicked").addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    val status = snapshot.getValue<Boolean>() ?: false
+                    _roomSeerPickedStatus.postValue(Resource.Success(status))
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                _roomSeerPickedStatus.postValue(Resource.Error(error.toException()))
+
+            }
+        })
+    }
+
+    fun getRoomIsDayStatus(roomName: String) {
         firebaseDatabase.getReference("/rooms/${roomName}/day")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         val status = snapshot.getValue<Boolean>() ?: false
                         _roomIsDayStatus.postValue(Event(Resource.Success(status)))
                     }
@@ -1049,6 +1132,7 @@ class PlayViewModel @Inject constructor(
 
             })
     }
+
     fun leaveRoom(name: String, id: String) = viewModelScope.launch {
         _leaveRoomResult.postValue(Event(Resource.Loading))
         val result = leaveRoom.leaveRoom(name, id)
@@ -1060,7 +1144,7 @@ class PlayViewModel @Inject constructor(
     }
 
 
-    fun getOutRoom(roomName: String, uid: String){
+    fun getOutRoom(roomName: String, uid: String) {
         firebaseDatabase.getReference("rooms")
     }
 }

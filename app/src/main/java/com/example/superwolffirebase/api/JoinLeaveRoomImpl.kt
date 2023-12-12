@@ -54,7 +54,8 @@ class JoinLeaveRoomImpl @Inject constructor(
                             expose = false,
                             ready = false,
                             protected = false,
-                            savedByWitch = false
+                            saveByWitch = false,
+                            killByWitch = false
                         )
 
                         reference.updateChildren(

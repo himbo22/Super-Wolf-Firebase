@@ -16,31 +16,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="70dp"
-            android:layout_marginTop="100dp"
             android:layout_marginEnd="70dp"
+            android:layout_marginBottom="30dp"
             android:background="@drawable/custom_button2"
             android:fontFamily="@font/doublefeature"
             android:text="@string/play"
             android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/profileButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/profileButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="100dp"
-            android:layout_marginTop="30dp"
             android:layout_marginEnd="100dp"
+            android:layout_marginBottom="30dp"
             android:background="@drawable/custom_button"
             android:fontFamily="@font/octobernight"
             android:text="@string/profile"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/friendsButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/playButton" />
+
+            app:layout_constraintStart_toStartOf="parent" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -48,16 +49,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="130dp"
-            android:layout_marginTop="30dp"
             android:layout_marginEnd="130dp"
             android:background="@drawable/custom_button"
             android:fontFamily="@font/octobernight"
             android:text="@string/friends"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileButton" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -94,7 +95,6 @@
             app:layout_constraintTop_toBottomOf="@id/settingButton" />
 
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -102,9 +102,9 @@
         android:id="@+id/rl_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:focusable="true"
-        android:clickable="true"
         android:background="@color/transparent"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="invisible">
 
         <ProgressBar

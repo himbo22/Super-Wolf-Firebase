@@ -16,6 +16,6 @@ data class PlayerInGame(
     var expose: Boolean? = null,
     var ready: Boolean? = null,
     var protected: Boolean? = null,
-    var savedByWitch: Boolean? = null,
+    var saveByWitch: Boolean? = null,
     var killByWitch: Boolean?=null
 ) : Parcelable

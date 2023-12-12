@@ -1,6 +1,9 @@
 package com.example.superwolffirebase.views.mainscreen.fragments
 
 import android.annotation.SuppressLint
+import android.content.res.Resources.Theme
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +12,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -50,7 +55,6 @@ class PlayFragment : Fragment(), OnItemClick {
     private val viewModel by viewModels<PlayViewModel>()
     private lateinit var playAdapter: PlayAdapter
     private lateinit var messageAdapter: MessageAdapter
-    private var isClick = false
 
 
     override fun onCreateView(
@@ -78,13 +82,7 @@ class PlayFragment : Fragment(), OnItemClick {
     private fun setUpView() {
 
         binding.healPotion.setOnClickListener {
-            isClick = if (isClick) {
-                viewModel.witchSave(args.room.name!!, true)
-                true
-            } else {
-                viewModel.witchSave(args.room.name!!, false)
-                false
-            }
+            viewModel.witchSave(args.room.name!!)
         }
 
         binding.ready.setOnClickListener {
@@ -92,7 +90,8 @@ class PlayFragment : Fragment(), OnItemClick {
         }
 
         binding.leave.setOnClickListener {
-            viewModel.leaveRoom(args.room.name!!, args.player.id!!)
+            val action = PlayFragmentDirections.actionPlayFragmentToConfirmLeavePlayRoom(args.room.name!!, args.player.id!!, args.player)
+            Navigation.findNavController(binding.root).navigate(action)
         }
 
 
@@ -109,18 +108,17 @@ class PlayFragment : Fragment(), OnItemClick {
     }
 
 
-    @SuppressLint("ResourceAsColor", "SetTextI18n")
     private fun setUpViewModel() {
         viewModel.getAllPlayers(args.room.name!!, args.player.id!!)
         viewModel.getAllMessages(args.room.name!!)
         viewModel.getPlayerInGame(args.player.id!!, args.room.name!!)
         viewModel.getRoom(args.room.name!!)
         viewModel.prepareToStartGame(args.room.name!!)
-        viewModel.playersRemaining(args.room.name!!)
+        viewModel.playersRemaining(args.room.name!!, args.player.id!!)
         viewModel.startGame(args.room.name!!, args.player.id!!)
         viewModel.autoPickRole(args.room.name!!, args.player.id!!)
         viewModel.playerCreateRoom(args.room.name!!, args.room.playerCreateRoomId!!)
-        viewModel.getHealPower(args.room.name!!)
+        viewModel.getHealPower(args.room.name!!, args.player.id!!)
         viewModel.getRoomHarmPower(args.room.name!!)
         viewModel.getRoomGameStarted(args.room.name!!)
         viewModel.getRoomWitchPhase(args.room.name!!)
@@ -131,8 +129,8 @@ class PlayFragment : Fragment(), OnItemClick {
 
 
 
-        viewModel.roomSeerPickedStatus.observe(viewLifecycleOwner){resource->
-            when(resource){
+        viewModel.roomSeerPickedStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
                 is Resource.Success -> {
                     resource.result.let {
                         playAdapter.setSeerPicked(it)
@@ -147,11 +145,11 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.seerPick.observe(viewLifecycleOwner){resource->
-            when(resource){
+        viewModel.seerPick.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
                 is Resource.Success -> {
                     resource.result.let {
-                        if (it != PlayerInGame()){
+                        if (it != PlayerInGame()) {
                             binding.notifyPlayerSeerPicked.show()
                             binding.tvPlayerSeerPicked.text = it.name
                             Glide.with(binding.imgPlayerSeerPicked.context).load(it.avatar)
@@ -160,12 +158,15 @@ class PlayFragment : Fragment(), OnItemClick {
                                 WEREWOLF -> {
                                     binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.werewolf_icon)
                                 }
+
                                 VILLAGER -> {
                                     binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.villager)
                                 }
+
                                 WITCH -> {
                                     binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.witch)
                                 }
+
                                 else -> {
                                     binding.imgPlayerRoleSeerPicked.setImageResource(R.drawable.shield)
                                 }
@@ -185,9 +186,9 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.roomIsDayStatus.observe(viewLifecycleOwner){event->
-            if (!event.hasBeenHandled){
-                event.getContentIfNotHandled()?.let { resource->
+        viewModel.roomIsDayStatus.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled()?.let { resource ->
                     when (resource) {
                         is Resource.Success -> {
                             resource.result.let {
@@ -200,16 +201,27 @@ class PlayFragment : Fragment(), OnItemClick {
                         }
 
                         else -> {}
-                    } }
+                    }
+                }
             }
         }
         viewModel.witchSaveStatus.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     if (resource.result) {
-                        binding.playerBeingTargeted.setTextColor(R.color.green)
+                        binding.playerBeingTargeted.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.green
+                            )
+                        )
                     } else {
-                        binding.playerBeingTargeted.setTextColor(R.color.red)
+                        binding.playerBeingTargeted.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.red
+                            )
+                        )
                     }
                 }
 
@@ -225,17 +237,18 @@ class PlayFragment : Fragment(), OnItemClick {
             when (resource) {
                 is Resource.Success -> {
 
-
                     resource.result.let { player ->
                         binding.notification.show()
                         if (player != PlayerInGame()) { // no one being targeted
+                            binding.playerBeingTargeted.show()
                             binding.playerBeingTargeted.text = "${player.name} being targeted"
-                            binding.playerBeingTargeted.show()
-                            binding.healPotion.show()
+                            binding.playerBeingTargetedAvatar.show()
+                            Glide.with(binding.playerBeingTargetedAvatar.context)
+                                .load(player.avatar).into(binding.playerBeingTargetedAvatar)
                         } else {
-                            binding.playerBeingTargeted.text = "No one being targeted"
                             binding.playerBeingTargeted.show()
-                            binding.healPotion.hide()
+                            binding.playerBeingTargeted.text = "No one being targeted"
+                            binding.playerBeingTargetedAvatar.hide()
                         }
                     }
                 }
@@ -260,6 +273,9 @@ class PlayFragment : Fragment(), OnItemClick {
                     }
                 }
 
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
 
                 else -> {
                     binding.notification.show()
@@ -504,25 +520,7 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.leaveRoomResult.observe(viewLifecycleOwner) { event ->
-            if (!event?.hasBeenHandled!!) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
 
-
-
-                        is Resource.Success -> {
-                            val action =
-                                PlayFragmentDirections.actionPlayFragmentToLobbyFragment(args.player)
-                            findNavController().navigate(action)
-                        }
-
-                        else -> {}
-                    }
-
-                }
-            }
-        }
 
         viewModel.allPlayer.observe(viewLifecycleOwner) { event ->
             if (!event.hasBeenHandled) {
@@ -583,17 +581,10 @@ class PlayFragment : Fragment(), OnItemClick {
                     // You can perform custom logic here
 
                     // Example: navigate back to the previous fragment or activity
-                    requireActivity().supportFragmentManager.popBackStack()
-                    viewModel.leaveRoomWhenClickBackButton(args.room.name!!, args.player.id!!)
                 }
             })
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 
     override fun vote(currentPlayer: PlayerInGame) {
         viewModel.votePlayer(

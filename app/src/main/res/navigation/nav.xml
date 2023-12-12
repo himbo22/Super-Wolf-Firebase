@@ -103,6 +103,7 @@
         android:label="ConfirmLogOutDialog" >
 
         <action
+
             android:id="@+id/action_confirmLogOutDialog_to_profileFragment2"
             app:destination="@id/profileFragment" />
 
@@ -126,7 +127,30 @@
         <argument
             android:name="playerInGame"
             app:argType="com.example.superwolffirebase.model.PlayerInGame" />
+        <action
+            android:id="@+id/action_playFragment_to_confirmLeavePlayRoom"
+            app:destination="@id/confirmLeavePlayRoom" />
 
     </fragment>
+
+    <dialog
+        android:id="@+id/confirmLeavePlayRoom"
+        android:name="com.example.superwolffirebase.dialog.ConfirmLeavePlayRoom"
+        android:label="ConfirmLeavePlayRoom" >
+        <action
+            android:id="@+id/action_confirmLeavePlayRoom_to_playFragment"
+            app:destination="@id/playFragment" />
+        <argument
+            android:name="roomName"
+            app:argType="string" />
+        <argument
+            android:name="uid"
+            app:argType="string" />
+        <argument
+            android:name="player"
+            app:argType="com.example.superwolffirebase.model.Player" />
+
+
+    </dialog>
 
 </navigation>

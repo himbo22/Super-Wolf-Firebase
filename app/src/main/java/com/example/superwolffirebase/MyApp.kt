@@ -128,6 +128,7 @@ fun Activity.registerFragmentLifecycleCallbacks() {
                     Log.d(DEBUG_FRAGMENT, "${f::class.java.simpleName} --> onFragmentDetached")
                 }
 
+
                 override fun onFragmentAttached(
                     fm: FragmentManager,
                     f: Fragment,

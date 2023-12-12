@@ -85,7 +85,6 @@ class PlayAdapter(
                 // vote
                 if (isDay == true) { // day
                     if (!currentPlayer.dead!!) {
-                        playerView.isClickable = true
                         playerView.setOnClickListener {
                             when (me.voteId) {
                                 "" -> {
@@ -107,10 +106,8 @@ class PlayAdapter(
 
 
                     if (witchPhase == true) { // start witch phase
-
                         if (me.role == WITCH) {
-                            if (harmPower == true && currentPlayer != me) {
-                                playerView.isClickable = true
+                            if (harmPower == true) {
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
                                         "" -> listener.witchPick(currentPlayer)
@@ -129,23 +126,23 @@ class PlayAdapter(
 
                         if (me.role == SEER) { // can not expose itself role
 
-                            showLog(seerPicked.toString())
+                                playerView.setOnClickListener {
+                                    when (seerPicked) {
+                                        false -> {
+                                            if (currentPlayer != me){
+                                                listener.seerPick(currentPlayer)
+                                            }
+                                        }
 
+                                        true -> {
 
-                            playerView.setOnClickListener {
-                                showLog("cac")
-                                when (seerPicked) {
-                                    false -> {
-                                        listener.seerPick(currentPlayer)
+                                        }
+
+                                        null -> {
+
+                                        }
                                     }
-
-                                    true -> {
-
-                                    }
-
-                                    null -> TODO()
                                 }
-                            }
 
 
                         } else if (me.role == WEREWOLF) { // can not vote alies
@@ -165,8 +162,6 @@ class PlayAdapter(
                                 }
                             }
                         } else if (me.role == GUARD) {
-                            playerView.isClickable = true
-
                             playerView.setOnClickListener {
                                 when (me.voteId) {
                                     "" -> listener.guardVote(currentPlayer)
@@ -175,9 +170,12 @@ class PlayAdapter(
                                 }
                             }
                         } else if (me.role == WITCH) {
-                            playerView.isClickable = false
+                            playerView.setOnClickListener {
+                            }
+
                         } else {
-                            playerView.isClickable = false
+                            playerView.setOnClickListener {
+                            }
                         }
                     }
                 }
@@ -204,7 +202,12 @@ class PlayAdapter(
                     }
                 } else { // night
                     if (witchPhase == true) {
+
                         if (me.role == WITCH) {
+
+                            constraintVote.invisible()
+                            constraintVoted.invisible()
+
                             if (me.voteId == currentPlayer.id) {
                                 toxicPotion.show()
                             } else {
@@ -212,22 +215,26 @@ class PlayAdapter(
                             }
                         }
                     } else {
-                        if (me.role == WEREWOLF && currentPlayer.role == WEREWOLF) { // if werewolf
-                            if (currentPlayer.voted != 0) {
-                                constraintVoted.show()
-                                tvVoted.text = currentPlayer.voted.toString()
-                            } else {
-                                constraintVoted.invisible()
-                            }
+                        if (me.role == WEREWOLF) { // if werewolf
+                            if (currentPlayer.role == WEREWOLF) {
+                                if (currentPlayer.voted != 0) {
+                                    constraintVoted.show()
+                                    tvVoted.text = currentPlayer.voted.toString()
+                                } else {
+                                    constraintVoted.invisible()
+                                }
 
-                            if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
-                                constraintVote.show()
-                                Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
-                                    .into(avatarVote)
-                            } else {
-                                constraintVote.invisible()
+                                if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
+                                    constraintVote.show()
+                                    Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
+                                        .into(avatarVote)
+                                } else {
+                                    constraintVote.invisible()
+                                }
                             }
                         } else if (me.role == GUARD) {
+                            constraintVote.invisible()
+                            constraintVoted.invisible()
                             if (me.voteId == currentPlayer.id) {
                                 cover.show()
                             } else {
@@ -245,6 +252,8 @@ class PlayAdapter(
 
                 if (gameStarted == true) {
                     if (currentPlayer.dead == true) {
+                        constraintVote.invisible()
+                        constraintVoted.invisible()
                         playAvatar.setImageResource(R.drawable.rip)
                         playerView.isClickable = false
                     } else {

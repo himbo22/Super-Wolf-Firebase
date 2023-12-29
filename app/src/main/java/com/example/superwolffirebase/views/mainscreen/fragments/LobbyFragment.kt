@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -40,10 +41,16 @@ class LobbyFragment : Fragment(), OnItemClickListener {
         setUpRoomAdapter()
         setUpObserveViewModel()
 
-        viewModel.getAllRooms()
 
         return binding.root
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAllRooms()
+        viewModel.playMainMenuMusic()
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -51,6 +58,10 @@ class LobbyFragment : Fragment(), OnItemClickListener {
     }
 
     private fun setUpView() {
+        binding.backBtn.setOnClickListener {
+            val action = LobbyFragmentDirections.actionPlayFragmentToMainScreenFragment()
+            findNavController().navigate(action)
+        }
         binding.btAddRoom.setOnClickListener {
             if (binding.etRoomName.text.isNullOrBlank()) {
                 return@setOnClickListener
@@ -60,6 +71,10 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                 binding.etRoomName.setText("")
 
             }
+        }
+        binding.swipeLayout.setOnRefreshListener {
+            viewModel.getAllRooms()
+            binding.swipeLayout.isRefreshing = false
         }
     }
 
@@ -124,7 +139,7 @@ class LobbyFragment : Fragment(), OnItemClickListener {
                     resource.exception.let {
                         Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                     }
-
+                    adapter.setData(emptyList())
                 }
 
                 else -> {}
@@ -171,5 +186,19 @@ class LobbyFragment : Fragment(), OnItemClickListener {
 
     }
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle the back button press in the fragment
+                    // You can perform custom logic here
+                    // Example: navigate back to the previous fragment or activity
+
+                }
+            })
+    }
 
 }

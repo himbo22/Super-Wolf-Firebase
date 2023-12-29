@@ -3,8 +3,10 @@ package com.example.superwolffirebase.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ItemListLobbyBinding
 import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.MyDiffUtil
@@ -39,8 +41,23 @@ class RoomAdapter(private val listener: OnItemClickListener) :
                 roomName.text = currentRoom.name
                 totalPlayer.text = "${currentRoom.amount}/9"
 
+                if (currentRoom.gameStarted == true) {
+                    room.setBackgroundColor(ContextCompat.getColor(room.context, R.color.grey))
+                }
+
                 room.setOnClickListener {
-                    listener.onItemClick(currentRoom)
+                    when (currentRoom.gameStarted) {
+                        true -> {
+                        }
+
+                        false -> {
+                            listener.onItemClick(currentRoom)
+                        }
+
+                        else -> {
+
+                        }
+                    }
                 }
 
             }

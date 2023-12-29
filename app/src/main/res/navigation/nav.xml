@@ -11,32 +11,21 @@
         android:label="fragment_main_screen"
         tools:layout="@layout/fragment_main_screen">
         <action
-            app:popUpToSaveState="true"
             android:id="@+id/action_mainScreenFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_mainScreenFragment_to_friendsFragment"
             app:destination="@id/friendsFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_mainScreenFragment_to_aboutFragment"
             app:destination="@id/aboutFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_mainScreenFragment_to_playFragment"
             app:destination="@id/lobbyFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_mainScreenFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_mainScreenFragment_to_lobbyFragment"
             app:destination="@id/lobbyFragment" />
     </fragment>
@@ -67,13 +56,14 @@
             android:id="@+id/action_playFragment_to_mainScreenFragment"
             app:destination="@id/mainScreenFragment" />
         <action
-            app:popUpToSaveState="true"
-
             android:id="@+id/action_playFragment_to_playFragment"
             app:destination="@id/playFragment" />
         <argument
             android:name="player"
             app:argType="com.example.superwolffirebase.model.Player" />
+        <action
+            android:id="@+id/action_lobbyFragment_to_confirmLeavePlayRoom"
+            app:destination="@id/confirmLeavePlayRoom" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -101,9 +91,7 @@
         android:id="@+id/confirmLogOutDialog"
         android:name="com.example.superwolffirebase.dialog.ConfirmLogOutDialog"
         android:label="ConfirmLogOutDialog" >
-
         <action
-
             android:id="@+id/action_confirmLogOutDialog_to_profileFragment2"
             app:destination="@id/profileFragment" />
 
@@ -149,7 +137,9 @@
         <argument
             android:name="player"
             app:argType="com.example.superwolffirebase.model.Player" />
-
+        <action
+            android:id="@+id/action_confirmLeavePlayRoom_to_lobbyFragment"
+            app:destination="@id/lobbyFragment" />
 
     </dialog>
 

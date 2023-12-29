@@ -7,12 +7,15 @@
     <color name="dark_pink">#D5348A</color>
     <color name="mtrl_textinput_default_box_stroke_color">#D5348A</color>
     <color name="transparent">#00000000</color>
+    <color name="transparent_soft">#9E000000</color>
     <color name="disable">#939191</color>
     <color name="soft_purple">#9b78f0</color>
     <color name="red">#FF0000</color>
+    <color name="witch_purple">#612f86</color>
     <color name="list_background">#C3291B1F</color>
     <color name="room">#591F57FF</color>
     <color name="rgb1">#5499CC33</color>
+    <color name="rgb1_alpha">#99CC33</color>
     <color name="rgb2">#FF6666</color>
     <color name="rgb3">#6699CC</color>
     <color name="grey">#808080</color>

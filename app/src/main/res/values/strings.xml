@@ -42,4 +42,6 @@
     <string name="days">DAYS:</string>
     <string name="night">NIGHT:</string>
     <string name="you_have_no_more_heal_potion">You have no more Heal Potion</string>
+    <string name="continue_">continue</string>
+    <string name="exit">exit</string>
 </resources>

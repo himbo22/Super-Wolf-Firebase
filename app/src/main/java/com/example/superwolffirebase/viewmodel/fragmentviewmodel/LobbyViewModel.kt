@@ -6,8 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.superwolffirebase.api.BaseAuth
 import com.example.superwolffirebase.api.CreateNewRoom
 import com.example.superwolffirebase.api.JoinLeaveRoom
+import com.example.superwolffirebase.api.SoundTrack
 import com.example.superwolffirebase.model.PlayerInGame
 import com.example.superwolffirebase.model.Room
+import com.example.superwolffirebase.other.Constant.DAY
+import com.example.superwolffirebase.other.Constant.MAIN_MENU
+import com.example.superwolffirebase.other.Constant.NIGHT
+import com.example.superwolffirebase.other.Constant.WAITING
 import com.example.superwolffirebase.other.Event
 import com.example.superwolffirebase.other.Resource
 import com.google.firebase.database.DataSnapshot
@@ -24,8 +29,8 @@ import kotlin.Exception
 class LobbyViewModel @Inject constructor(
     private val repository: CreateNewRoom,
     private val firebaseDatabase: FirebaseDatabase,
-    private val baseAuth: BaseAuth,
-    private val joinRoom: JoinLeaveRoom
+    private val joinRoom: JoinLeaveRoom,
+    private val soundTrack: SoundTrack
 ) : ViewModel() {
 
     private val _newRoom = MutableLiveData<Event<Resource<Pair<Room,PlayerInGame>>>>()
@@ -35,6 +40,10 @@ class LobbyViewModel @Inject constructor(
     private val _joinRoomResult = MutableLiveData<Event<Resource<PlayerInGame>>>()
     val joinRoomResult  = _joinRoomResult
 
+
+    fun playMainMenuMusic(){
+        soundTrack.play(MAIN_MENU)
+    }
 
     fun joinRoom(
         roomName: String,

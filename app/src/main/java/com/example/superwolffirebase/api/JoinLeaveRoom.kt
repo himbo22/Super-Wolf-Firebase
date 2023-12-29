@@ -25,8 +25,5 @@ interface JoinLeaveRoom {
     ): Event<Resource<DatabaseReference>>
 
 
-    suspend fun leaveRoomWhenClickBackButton(
-        roomName: String,
-        id: String,
-    ): Event<Resource<DatabaseReference>>
+
 }

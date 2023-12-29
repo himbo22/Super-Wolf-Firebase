@@ -1,5 +1,9 @@
 package com.example.superwolffirebase.views.mainscreen.fragments
 
+import android.app.Activity
+import android.content.Context
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +22,8 @@ import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.viewmodel.fragmentviewmodel.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import javax.inject.Named
 
 
 @AndroidEntryPoint
@@ -28,6 +34,8 @@ class MainScreenFragment : Fragment() {
     private val viewModel by viewModels<MainScreenViewModel>()
     private lateinit var player: Player
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +45,8 @@ class MainScreenFragment : Fragment() {
 
 
 
+        viewModel.theBeginning()
+
         setUpFragmentAction()
         setUpObserveViewModel()
 
@@ -45,6 +55,10 @@ class MainScreenFragment : Fragment() {
 
         return view
     }
+
+
+
+
 
     private fun setUpObserveViewModel(){
         viewModel.completeProfile.observe(viewLifecycleOwner) { resource ->

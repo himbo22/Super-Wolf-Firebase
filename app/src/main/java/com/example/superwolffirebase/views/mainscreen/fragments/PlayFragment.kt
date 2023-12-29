@@ -1,18 +1,13 @@
 package com.example.superwolffirebase.views.mainscreen.fragments
 
-import android.annotation.SuppressLint
-import android.content.res.Resources.Theme
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -26,7 +21,6 @@ import com.example.superwolffirebase.adapter.MessageAdapter
 import com.example.superwolffirebase.adapter.PlayAdapter
 import com.example.superwolffirebase.databinding.FragmentPlayBinding
 import com.example.superwolffirebase.model.PlayerInGame
-import com.example.superwolffirebase.model.Room
 import com.example.superwolffirebase.other.Constant.GUARD
 import com.example.superwolffirebase.other.Constant.SEER
 import com.example.superwolffirebase.other.Constant.VILLAGER
@@ -41,9 +35,6 @@ import com.example.superwolffirebase.utils.show
 import com.example.superwolffirebase.utils.showLog
 import com.example.superwolffirebase.viewmodel.fragmentviewmodel.PlayViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlin.time.ExperimentalTime
 
 
 @GlideModule
@@ -64,7 +55,7 @@ class PlayFragment : Fragment(), OnItemClick {
         _binding = FragmentPlayBinding.inflate(inflater, container, false)
 
 
-
+        binding.timerBar.progress = 0
 
         setUpView()
 
@@ -80,6 +71,14 @@ class PlayFragment : Fragment(), OnItemClick {
     }
 
     private fun setUpView() {
+
+        binding.btnExit.setOnClickListener {
+            viewModel.exitRoom(args.room.name!!, args.player.id!!)
+        }
+
+        binding.btnContinue.setOnClickListener {
+            viewModel.continueGame(args.room.name!!, args.player.id!!)
+        }
 
         binding.healPotion.setOnClickListener {
             viewModel.witchSave(args.room.name!!)
@@ -113,11 +112,8 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.getAllMessages(args.room.name!!)
         viewModel.getPlayerInGame(args.player.id!!, args.room.name!!)
         viewModel.getRoom(args.room.name!!)
-        viewModel.prepareToStartGame(args.room.name!!)
+        viewModel.prepareToStartGame(args.room.name!!, args.player.id!!)
         viewModel.playersRemaining(args.room.name!!, args.player.id!!)
-        viewModel.startGame(args.room.name!!, args.player.id!!)
-        viewModel.autoPickRole(args.room.name!!, args.player.id!!)
-        viewModel.playerCreateRoom(args.room.name!!, args.room.playerCreateRoomId!!)
         viewModel.getHealPower(args.room.name!!, args.player.id!!)
         viewModel.getRoomHarmPower(args.room.name!!)
         viewModel.getRoomGameStarted(args.room.name!!)
@@ -125,8 +121,115 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.getRoomGameEnded(args.room.name!!)
         viewModel.getRoomIsDayStatus(args.room.name!!)
         viewModel.getRoomSeerPicked(args.room.name!!)
+        viewModel.getSecondTimeCountdown(args.room.name!!)
 
 
+        viewModel.continueGameStatus.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled().let { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            binding.endGame.hide()
+                        }
+
+                        is Resource.Error -> {
+                            showLog(resource.exception.message.toString())
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        viewModel.leaveRoomResult.observe(viewLifecycleOwner) { event ->
+            if (!event.hasBeenHandled) {
+                event.getContentIfNotHandled().let { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            val action =
+                                PlayFragmentDirections.actionPlayFragmentToLobbyFragment(args.player)
+                            findNavController().navigate(action)
+                        }
+
+                        is Resource.Error -> {
+                            showLog(resource.exception.message.toString())
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        viewModel.timingMusicStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    when (resource.result) {
+//                        "day" -> {
+//                            viewModel.startDayMusic()
+//                        }
+//
+//                        "night" -> {
+//                            viewModel.startNightAndWitchMusic()
+//                        }
+                        "waiting" -> {
+                            viewModel.startWaitingMusic()
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.secondCountdown.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    binding.timerBar.progress = resource.result.toInt()
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
+
+        viewModel.winSideStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    when (resource.result) {
+                        WEREWOLF -> {
+                            binding.screen.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.soft_pink
+                                )
+                            )
+                            binding.endGame.show()
+                            binding.winnerSide.setImageResource(R.drawable.soicodoc)
+                        }
+
+                        VILLAGER -> {
+                            binding.endGame.show()
+                            binding.winnerSide.setImageResource(R.drawable.villager)
+                        }
+
+                        "" -> {
+
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
+            }
+        }
 
 
         viewModel.roomSeerPickedStatus.observe(viewLifecycleOwner) { resource ->
@@ -144,6 +247,7 @@ class PlayFragment : Fragment(), OnItemClick {
                 else -> {}
             }
         }
+
 
         viewModel.seerPick.observe(viewLifecycleOwner) { resource ->
             when (resource) {
@@ -186,23 +290,93 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.roomIsDayStatus.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            resource.result.let {
-                                playAdapter.setIsDay(it)
+        viewModel.roomIsDayStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.result.let {
+                        playAdapter.setIsDay(it)
+
+                        when {
+                            it -> {
+                                binding.timerBar.max = 104
+                                binding.days.setTextColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.black
+                                    )
+                                )
+                                binding.nights.setTextColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.black
+                                    )
+                                )
+
+                                binding.leave.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.black
+                                    )
+                                )
+                                binding.menu.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.black
+                                    )
+                                )
+                                binding.screen.setBackgroundColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.soft_pink
+                                    )
+                                )
                             }
-                        }
 
-                        is Resource.Error -> {
-                            showLog(resource.exception.message.toString())
-                        }
+                            !it -> {
+                                binding.timerBar.max = 30
+                                binding.days.setTextColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.white
+                                    )
+                                )
+                                binding.nights.setTextColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.white
+                                    )
+                                )
 
-                        else -> {}
+                                binding.leave.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.white
+                                    )
+                                )
+                                binding.menu.setColorFilter(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.white
+                                    )
+                                )
+                                binding.screen.setBackgroundColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.night
+                                    )
+                                )
+                            }
+
+
+                        }
                     }
                 }
+
+                is Resource.Error -> {
+                    showLog(resource.exception.message.toString())
+                }
+
+                else -> {}
             }
         }
         viewModel.witchSaveStatus.observe(viewLifecycleOwner) { resource ->
@@ -288,6 +462,15 @@ class PlayFragment : Fragment(), OnItemClick {
             when (resource) {
                 is Resource.Success -> {
                     playAdapter.setWitchPhase(resource.result)
+                    if (resource.result) {
+                        binding.screen.setBackgroundColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.witch_purple
+                            )
+                        )
+                        binding.timerBar.max = 23
+                    }
                 }
 
                 is Resource.Error -> {
@@ -301,6 +484,9 @@ class PlayFragment : Fragment(), OnItemClick {
         viewModel.gameEndedStatus.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    if (resource.result) {
+
+                    }
                     playAdapter.setGameEnded(resource.result)
                 }
 
@@ -341,99 +527,54 @@ class PlayFragment : Fragment(), OnItemClick {
         }
 
 
+//        viewModel.startNewDay.observe(viewLifecycleOwner) { resource ->
+//            when (resource) {
+//                is Resource.Success -> {
+//                    binding.days.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+//                    binding.nights.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+//                    binding.timer.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+//                    binding.leave.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black))
+//                    binding.menu.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black))
+//                    binding.screen.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//
+//        viewModel.startNewNight.observe(viewLifecycleOwner) { resource ->
+//            when (resource) {
+//                is Resource.Success -> {
+//
+//                }
+//
+//                else -> {}
+//            }
+//        }
 
-        viewModel.startNewDay.observe(viewLifecycleOwner) { resource ->
+
+
+
+
+
+
+
+
+        viewModel.getRoom.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-//                    binding.days.setTextColor(R.color.black)
-//                    binding.nights.setTextColor(R.color.black)
-//                    binding.timer.setTextColor(R.color.black)
-//                    binding.getBack.setColorFilter(R.color.black)
-//                    binding.menu.setColorFilter(R.color.black)
-//                    binding.screen.setBackgroundColor(R.color.white)
-                }
-
-                else -> {}
-            }
-        }
-
-        viewModel.startNewNight.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    Toast.makeText(requireContext(), resource.result, Toast.LENGTH_SHORT).show()
-//                    binding.days.setTextColor(R.color.white)
-//                    binding.nights.setTextColor(R.color.white)
-//                    binding.timer.setTextColor(R.color.white)
-//                    binding.getBack.setColorFilter(R.color.white)
-//                    binding.menu.setColorFilter(R.color.white)
-//                    binding.screen.setBackgroundColor(R.color.night)
-                }
-
-                else -> {}
-            }
-        }
-
-
-
-        viewModel.role.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            Toast.makeText(
-                                requireContext(),
-                                "You are ${resource.result}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-        }
-
-
-
-
-
-
-        viewModel.timeCountDown.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Success -> {
-                    binding.timer.text = resource.result
+                    binding.ready.isClickable = resource.result.gameStarted != true
+                    binding.days.text = resource.result.days.toString()
+                    binding.nights.text = resource.result.nights.toString()
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(requireContext(), resource.exception.message, Toast.LENGTH_SHORT)
-                        .show()
+                    showLog(resource.exception.message.toString())
                 }
 
                 else -> {}
             }
-        }
 
-
-
-
-        viewModel.getRoom.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            binding.ready.isClickable = resource.result.gameStarted != true
-                            binding.days.text = resource.result.days.toString()
-                            binding.nights.text = resource.result.nights.toString()
-                        }
-
-                        is Resource.Error -> {
-                            showLog(resource.exception.message.toString())
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
         }
 
         viewModel.unVotePlayer.observe(viewLifecycleOwner) { resource ->
@@ -500,48 +641,42 @@ class PlayFragment : Fragment(), OnItemClick {
             }
         }
 
-        viewModel.allMessage.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            resource.result.let {
-                                messageAdapter.setData(it)
-                            }
-                        }
+        viewModel.allMessage.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.result.let {
+                        messageAdapter.setData(it)
+                        binding.messageList.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                    }
+                }
 
-                        is Resource.Error -> {
-                        }
+                is Resource.Error -> {
+                }
 
                         else -> {}
                     }
 
-                }
-            }
         }
 
 
 
-        viewModel.allPlayer.observe(viewLifecycleOwner) { event ->
-            if (!event.hasBeenHandled) {
-                event.getContentIfNotHandled()?.let { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            resource.result.let {
-                                playAdapter.setData(it)
-                            }
-                        }
+        viewModel.allPlayer.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    resource.result.let {
+                        playAdapter.setData(it)
+                    }
+                }
 
-                        is Resource.Error -> {
-                            Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
-                        }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                }
 
                         else -> {}
-                    }
 
-                }
             }
         }
+
         viewModel.sendMessResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -564,9 +699,9 @@ class PlayFragment : Fragment(), OnItemClick {
         binding.playerList.setHasFixedSize(true)
 
         messageAdapter = MessageAdapter()
-        binding.messageList.layoutManager = LinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
+        binding.messageList.layoutManager = layoutManager
         binding.messageList.adapter = messageAdapter
-
     }
 
 

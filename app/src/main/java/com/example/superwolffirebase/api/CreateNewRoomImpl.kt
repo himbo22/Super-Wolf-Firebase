@@ -33,7 +33,7 @@ class CreateNewRoomImpl @Inject constructor(
                     nights = 0,
                     gameStarted = false,
                     gameEnded = false,
-                    day  = true,
+                    day  = null,
                     remaining = 0,
                     playerCreateRoomId = playerId,
                     harmPower  = true,

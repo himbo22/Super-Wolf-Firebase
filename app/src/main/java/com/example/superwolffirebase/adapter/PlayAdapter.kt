@@ -1,12 +1,8 @@
 package com.example.superwolffirebase.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,21 +10,15 @@ import com.bumptech.glide.annotation.GlideModule
 import com.example.superwolffirebase.R
 import com.example.superwolffirebase.databinding.ItemPlayerBinding
 import com.example.superwolffirebase.model.PlayerInGame
-import com.example.superwolffirebase.model.Room
-import com.example.superwolffirebase.other.Constant
 import com.example.superwolffirebase.other.Constant.GUARD
 import com.example.superwolffirebase.other.Constant.SEER
 import com.example.superwolffirebase.other.Constant.VILLAGER
 import com.example.superwolffirebase.other.Constant.WEREWOLF
 import com.example.superwolffirebase.other.Constant.WITCH
 import com.example.superwolffirebase.other.OnItemClick
-import com.example.superwolffirebase.other.OneRoomDiffUtil
 import com.example.superwolffirebase.other.PlayDiffUtil
 import com.example.superwolffirebase.utils.invisible
 import com.example.superwolffirebase.utils.show
-import com.example.superwolffirebase.utils.showLog
-import okhttp3.internal.notify
-import kotlin.math.log
 
 
 @GlideModule
@@ -72,10 +62,8 @@ class PlayAdapter(
 
         holder.apply {
             binding.apply {
+
                 playerName.text = currentPlayer.name
-
-
-
 
                 if (gameEnded == true) {
                     playerRole.show()
@@ -116,10 +104,11 @@ class PlayAdapter(
                                     }
                                 }
                             } else {
-                                playerView.isClickable = false
+                                playerView.setOnClickListener { }
+
                             }
                         } else {
-                            playerView.isClickable = false
+                            playerView.setOnClickListener { }
                         }
 
                     } else { // not come to witch phase yet
@@ -148,7 +137,6 @@ class PlayAdapter(
                         } else if (me.role == WEREWOLF) { // can not vote alies
 
                             if (currentPlayer.role != WEREWOLF && currentPlayer != me) {
-                                playerView.isClickable = true
 
                                 playerView.setOnClickListener {
                                     when (me.voteId) {
@@ -200,6 +188,7 @@ class PlayAdapter(
                     } else {
                         constraintVote.invisible()
                     }
+
                 } else { // night
                     if (witchPhase == true) {
 
@@ -215,22 +204,21 @@ class PlayAdapter(
                             }
                         }
                     } else {
-                        if (me.role == WEREWOLF) { // if werewolf
-                            if (currentPlayer.role == WEREWOLF) {
-                                if (currentPlayer.voted != 0) {
-                                    constraintVoted.show()
-                                    tvVoted.text = currentPlayer.voted.toString()
-                                } else {
-                                    constraintVoted.invisible()
-                                }
 
-                                if (currentPlayer.voteAvatar.isNullOrBlank().not()) {
-                                    constraintVote.show()
-                                    Glide.with(avatarVote.context).load(currentPlayer.voteAvatar)
-                                        .into(avatarVote)
-                                } else {
-                                    constraintVote.invisible()
-                                }
+                        if (me.role == WEREWOLF) { // if werewolf
+                            if (currentPlayer.voteAvatar != null && currentPlayer.role == WEREWOLF){
+                                constraintVote.show()
+                                Glide.with(avatarVote.context).load(me.voteAvatar)
+                                    .into(avatarVote)
+                            } else {
+                                constraintVote.invisible()
+                            }
+
+                            if (currentPlayer.voted != 0) {
+                                constraintVoted.show()
+                                tvVoted.text = currentPlayer.voted.toString()
+                            } else {
+                                constraintVoted.invisible()
                             }
                         } else if (me.role == GUARD) {
                             constraintVote.invisible()
@@ -240,7 +228,12 @@ class PlayAdapter(
                             } else {
                                 cover.invisible()
                             }
+                        } else {
+                            constraintVote.invisible()
+                            constraintVoted.invisible()
                         }
+
+
                     }
 
 
